@@ -20,6 +20,10 @@ main =
         }
 
 
+
+-- MODEL
+
+
 type alias Model =
     { tab : Tab
     , videoId : Maybe VideoId
@@ -27,11 +31,6 @@ type alias Model =
     , videoTime : VideoTime
     , videos : List Video
     }
-
-
-getVideo : Maybe VideoId -> List Video -> Maybe Video
-getVideo videoId videos =
-    videoId |> Maybe.andThen (\id -> List.find (.id >> (==) id) videos)
 
 
 init : () -> ( Model, Cmd Msg )
@@ -44,6 +43,10 @@ init () =
       }
     , Cmd.none
     )
+
+
+
+-- UPDATE
 
 
 type Msg
@@ -139,6 +142,15 @@ update msg model =
             ( model, jumpToSubtitle subtitle )
 
 
+getVideo : Maybe VideoId -> List Video -> Maybe Video
+getVideo videoId videos =
+    videoId |> Maybe.andThen (\id -> List.find (.id >> (==) id) videos)
+
+
+
+-- VIEW
+
+
 view : Model -> Html Msg
 view model =
     Html.div []
@@ -146,10 +158,10 @@ view model =
         , Html.div [ class "pt-24 px-3" ]
             [ case model.tab of
                 SelectVideoTab ->
-                    viewFindTab model
+                    viewSelectVideoTab model
 
                 PlayVideoTab ->
-                    viewListenTab model
+                    viewPlayVideoTab model
             ]
         ]
 
@@ -189,14 +201,14 @@ viewTab model tab =
         ]
 
 
-viewFindTab : Model -> Html Msg
-viewFindTab model =
+viewSelectVideoTab : Model -> Html Msg
+viewSelectVideoTab model =
     Html.div []
         (List.map (viewVideoCard model) model.videos)
 
 
-viewListenTab : Model -> Html Msg
-viewListenTab model =
+viewPlayVideoTab : Model -> Html Msg
+viewPlayVideoTab model =
     case getVideo model.videoId model.videos of
         Nothing ->
             Html.div [ class "flex flex-col items-center" ]
@@ -354,6 +366,10 @@ playButton model attributes =
     else
         Html.button (attributes ++ [ onClick PlayVideo ])
             [ labeledSymbol "Play" "▶" ]
+
+
+
+-- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
