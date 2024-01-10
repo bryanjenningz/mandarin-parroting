@@ -7,7 +7,7 @@ import Html.Attributes as Attr exposing (attribute, class, classList)
 import Html.Events exposing (onClick, onInput)
 import List.Extra as List
 import Task
-import Video exposing (Subtitle, Video, VideoId, VideoTime, getNextSubtitle, getPrevSubtitle, getSubtitleAt)
+import Video exposing (Subtitle, Video, VideoId, VideoTime, getNextSubtitle, getPrevSubtitle, subtitleAt)
 
 
 main : Program () Model Msg
@@ -223,7 +223,7 @@ viewPlayVideoTab model =
         Just video ->
             let
                 currentSubtitle =
-                    getSubtitleAt model.videoTime video.subtitles
+                    subtitleAt model.videoTime video.subtitles
                         |> Maybe.withDefault (Subtitle "" "" -1)
             in
             Html.div [ class "flex flex-col items-center gap-2 h-full" ]
