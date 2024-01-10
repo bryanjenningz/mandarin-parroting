@@ -31,9 +31,7 @@
       app.ports.playVideo.subscribe(playVideo);
       app.ports.pauseVideo.subscribe(pauseVideo);
       app.ports.setVideoTime.subscribe(setVideoTime);
-      app.ports.playRecording.subscribe(playRecording);
       app.ports.loadVideo.subscribe(loadVideo);
-      app.ports.saveRecordings.subscribe(saveRecordings);
 
       function startVideo(videoId) {
         if (!player || !player.loadVideoById) return initVideo(videoId);
@@ -69,12 +67,6 @@
         app.ports.getVideoTime.send(videoTime);
       }
 
-      function playRecording(recording) {
-        if (!player) return initVideo();
-        player.seekTo(recording.time);
-        playVideo();
-      }
-
       function loadVideo(videoId) {
         if (!player || !player.loadVideoById) return initVideo(videoId);
         player.loadVideoById(videoId);
@@ -102,14 +94,6 @@
       }
 
       initVideo();
-
-      function getRecordings() {
-        return localStorage.getItem(RECORDINGS_KEY);
-      }
-
-      function saveRecordings(recordings) {
-        localStorage.setItem(RECORDINGS_KEY, JSON.stringify(recordings));
-      }
     </script>
   </body>
 </html>

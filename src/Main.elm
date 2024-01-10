@@ -5,16 +5,19 @@ import Browser.Dom as Dom
 import Html exposing (Attribute, Html)
 import Html.Attributes as Attr exposing (attribute, class, classList)
 import Html.Events exposing (onClick, onInput)
-import Http
-import Json.Decode as Json
 import List.Extra as List
 import Task
-import Video exposing (Subtitle, Video, VideoId, VideoTime, decodeVideo, getNextSubtitle, getPrevSubtitle, getSubtitleAt)
+import Video exposing (Subtitle, Video, VideoId, VideoTime, getNextSubtitle, getPrevSubtitle, getSubtitleAt)
 
 
-backendUrlRoot : String
-backendUrlRoot =
-    "https://raw.githubusercontent.com/bryanjenningz/listening-practice-web-app/main/static/"
+main : Program () Model Msg
+main =
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 type alias TabData =
@@ -44,10 +47,6 @@ tabs =
       , icon = "headphones"
       , content = viewListenTab
       }
-    , { text = "Review"
-      , icon = "grading"
-      , content = viewReviewTab
-      }
     ]
 
 
@@ -57,7 +56,6 @@ type alias Model =
     , videoIsPlaying : Bool
     , videoTime : VideoTime
     , videos : List Video
-    , recordings : List Recording
     }
 
 
@@ -65,57 +63,20 @@ type alias TabId =
     Int
 
 
-type alias Recording =
-    { videoId : VideoId
-    , time : Float
-    , text : String
-    }
-
-
-decodeRecordings : Json.Decoder (List Recording)
-decodeRecordings =
-    Json.list <|
-        Json.map3 Recording
-            (Json.field "videoId" Json.string)
-            (Json.field "time" Json.float)
-            (Json.field "text" Json.string)
-
-
 getVideo : Maybe VideoId -> List Video -> Maybe Video
 getVideo videoId videos =
     videoId |> Maybe.andThen (\id -> List.find (.id >> (==) id) videos)
 
 
-fetchVideo : String -> Cmd Msg
-fetchVideo videoId =
-    Http.get
-        { url = backendUrlRoot ++ videoId ++ ".json"
-        , expect = Http.expectJson GotVideo (decodeVideo videoId)
-        }
-
-
-videoIds : List String
-videoIds =
-    [ "bmgZsgcPd_8"
-    , "gx874_psuUk"
-    , "RUkjrZZolSo"
-    ]
-
-
-init : Json.Value -> ( Model, Cmd Msg )
-init recordingsJson =
+init : () -> ( Model, Cmd Msg )
+init () =
     ( { tabId = 0
       , videoId = Nothing
       , videoIsPlaying = False
       , videoTime = 0
       , videos = []
-      , recordings =
-            recordingsJson
-                |> Json.decodeValue Json.string
-                |> Result.andThen (Json.decodeString decodeRecordings)
-                |> Result.withDefault []
       }
-    , Cmd.batch (List.map fetchVideo videoIds)
+    , Cmd.none
     )
 
 
@@ -129,11 +90,7 @@ type Msg
     | FastRewind
     | GetVideoTime VideoTime
     | SetVideoTime VideoTime
-    | SaveRecording
-    | PlayRecording Recording
-    | DeleteRecording Recording
     | LoadVideo VideoId
-    | GotVideo (Result Http.Error Video)
     | JumpToSubtitle Subtitle
 
 
@@ -203,42 +160,6 @@ update msg model =
         SetVideoTime videoTime ->
             ( model, setVideoTime videoTime )
 
-        SaveRecording ->
-            case getVideo model.videoId model.videos of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just video ->
-                    case getSubtitleAt model.videoTime video.subtitles of
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                        Just subtitle ->
-                            let
-                                recordings =
-                                    (model.recordings ++ [ subtitle ])
-                                        |> List.unique
-                                        |> List.sortWith
-                                            (\a b ->
-                                                if a.videoId /= b.videoId then
-                                                    compare a.time b.time
-
-                                                else
-                                                    compare a.videoId b.videoId
-                                            )
-                            in
-                            ( { model | recordings = recordings }, saveRecordings recordings )
-
-        PlayRecording recording ->
-            ( { model | videoIsPlaying = True }, playRecording recording )
-
-        DeleteRecording deletedRecording ->
-            let
-                recordings =
-                    List.remove deletedRecording model.recordings
-            in
-            ( { model | recordings = recordings }, saveRecordings recordings )
-
         LoadVideo videoId ->
             ( { model
                 | videoId = Just videoId
@@ -247,25 +168,6 @@ update msg model =
               }
             , loadVideo videoId
             )
-
-        GotVideo response ->
-            case response of
-                Err _ ->
-                    ( model, Cmd.none )
-
-                Ok video ->
-                    ( { model
-                        | videos =
-                            (model.videos ++ [ video ])
-                                |> List.unique
-                                |> List.sortBy
-                                    (\v ->
-                                        List.findIndex ((==) v.id) videoIds
-                                            |> Maybe.withDefault -1
-                                    )
-                      }
-                    , Cmd.none
-                    )
 
         JumpToSubtitle subtitle ->
             ( model, jumpToSubtitle subtitle )
@@ -362,13 +264,6 @@ viewListenTab model =
                         ]
                         [ labeledSymbol "Fast-forward" ">>" ]
                     ]
-                , Html.div []
-                    [ Html.button
-                        [ onClick SaveRecording
-                        , class "bg-cyan-500 px-16 h-12 hover:bg-cyan-600"
-                        ]
-                        [ Html.text "Save" ]
-                    ]
                 , Html.div [ Attr.id subtitlesContainerId, class "overflow-y-scroll h-1/2 md:h-3/5" ]
                     (video.subtitles
                         |> List.map
@@ -423,55 +318,6 @@ labeledSymbol label symbol =
         [ Html.span [ attribute "aria-hidden" "true" ] [ Html.text symbol ]
         , Html.span [ class "sr-only" ] [ Html.text label ]
         ]
-
-
-viewReviewTab : Model -> Html Msg
-viewReviewTab model =
-    if List.isEmpty model.recordings then
-        Html.div [ class "text-center text-xl" ]
-            [ Html.p [ class "mb-5" ] [ Html.text "No recordings saved yet." ]
-            , Html.p []
-                [ Html.text """Click the "Save" button in the "Listen" tab to save a recording.""" ]
-            ]
-
-    else
-        Html.div [ class "grid gap-4 w-full md:w-3/4 lg:w-1/2 mx-auto" ]
-            (List.map
-                (\recording ->
-                    Html.div [ class "grid gap-2 shadow shadow-white p-5" ]
-                        [ Html.div []
-                            [ getVideo (Just recording.videoId) model.videos
-                                |> Maybe.map .title
-                                |> Maybe.withDefault ""
-                                |> Html.text
-                            ]
-                        , Html.div [] [ Html.text (formatTime recording.time) ]
-                        , Html.div []
-                            [ Html.text recording.text ]
-                        , Html.div [ class "flex justify-between" ]
-                            [ if Just recording.videoId == model.videoId then
-                                Html.button
-                                    [ onClick (PlayRecording recording)
-                                    , class "px-5 h-12 bg-cyan-500 hover:bg-cyan-600"
-                                    ]
-                                    [ Html.text "Play" ]
-
-                              else
-                                Html.button
-                                    [ onClick (LoadVideo recording.videoId)
-                                    , class "px-5 h-12 bg-cyan-500 hover:bg-cyan-600"
-                                    ]
-                                    [ Html.text "Load video" ]
-                            , Html.button
-                                [ onClick (DeleteRecording recording)
-                                , class "px-5 h-12 bg-cyan-500 hover:bg-cyan-600"
-                                ]
-                                [ Html.text "Delete" ]
-                            ]
-                        ]
-                )
-                model.recordings
-            )
 
 
 formatTime : Float -> String
@@ -544,19 +390,3 @@ port setVideoTime : Float -> Cmd msg
 
 
 port loadVideo : String -> Cmd msg
-
-
-port playRecording : Recording -> Cmd msg
-
-
-port saveRecordings : List Recording -> Cmd msg
-
-
-main : Program Json.Value Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
