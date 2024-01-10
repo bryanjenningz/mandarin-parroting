@@ -7,7 +7,7 @@ import Html.Attributes as Attr exposing (attribute, class, classList)
 import Html.Events exposing (onClick, onInput)
 import List.Extra as List
 import Task
-import Video exposing (Subtitle, Video, VideoId, VideoTime, getNextSubtitle, getPrevSubtitle, subtitleAt)
+import Video exposing (Subtitle, Video, VideoId, VideoTime, nextSubtitle, prevSubtitle, subtitleAt)
 
 
 main : Program () Model Msg
@@ -97,7 +97,7 @@ update msg model =
                 maybeNextSubtitleTime =
                     getVideo model.videoId model.videos
                         |> Maybe.map .subtitles
-                        |> Maybe.andThen (getNextSubtitle model.videoTime)
+                        |> Maybe.andThen (nextSubtitle model.videoTime)
                         |> Maybe.map .time
             in
             case maybeNextSubtitleTime of
@@ -113,7 +113,7 @@ update msg model =
                 maybePrevSubtitleTime =
                     getVideo model.videoId model.videos
                         |> Maybe.map .subtitles
-                        |> Maybe.andThen (getPrevSubtitle model.videoTime)
+                        |> Maybe.andThen (prevSubtitle model.videoTime)
                         |> Maybe.map .time
             in
             case maybePrevSubtitleTime of

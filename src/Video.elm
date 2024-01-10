@@ -1,4 +1,4 @@
-module Video exposing (Subtitle, Video, VideoId, VideoTime, decodeVideo, getNextSubtitle, getPrevSubtitle, subtitleAt)
+module Video exposing (Subtitle, Video, VideoId, VideoTime, decode, nextSubtitle, prevSubtitle, subtitleAt)
 
 import Dict
 import Json.Decode as Json
@@ -39,13 +39,13 @@ subtitleAt videoTime subtitles =
             subtitle
 
 
-getNextSubtitle : VideoTime -> List Subtitle -> Maybe Subtitle
-getNextSubtitle videoTime subtitles =
+nextSubtitle : VideoTime -> List Subtitle -> Maybe Subtitle
+nextSubtitle videoTime subtitles =
     List.find (\sub -> videoTime < sub.time) subtitles
 
 
-getPrevSubtitle : VideoTime -> List Subtitle -> Maybe Subtitle
-getPrevSubtitle videoTime subtitles =
+prevSubtitle : VideoTime -> List Subtitle -> Maybe Subtitle
+prevSubtitle videoTime subtitles =
     let
         timeTolerance =
             0.8
@@ -58,8 +58,8 @@ getPrevSubtitle videoTime subtitles =
             subtitle
 
 
-decodeVideo : String -> Json.Decoder Video
-decodeVideo videoId =
+decode : String -> Json.Decoder Video
+decode videoId =
     Json.map4 Video
         (Json.succeed videoId)
         (Json.field "title" Json.string)
@@ -70,6 +70,10 @@ decodeVideo videoId =
             )
         )
         (Json.field "subtitles" (decodeSubtitles videoId))
+
+
+
+-- INTERNAL
 
 
 decodeSubtitles : String -> Json.Decoder (List Subtitle)
