@@ -20,47 +20,13 @@ main =
         }
 
 
-type alias TabData =
-    { text : String
-    , icon : String
-    , content : Model -> Html Msg
-    }
-
-
-findTabId : TabId
-findTabId =
-    0
-
-
-listenTabId : TabId
-listenTabId =
-    1
-
-
-tabs : List TabData
-tabs =
-    [ { text = "Find"
-      , icon = "search"
-      , content = viewFindTab
-      }
-    , { text = "Listen"
-      , icon = "headphones"
-      , content = viewListenTab
-      }
-    ]
-
-
 type alias Model =
-    { tabId : TabId
+    { tab : Tab
     , videoId : Maybe VideoId
     , videoIsPlaying : Bool
     , videoTime : VideoTime
     , videos : List Video
     }
-
-
-type alias TabId =
-    Int
 
 
 getVideo : Maybe VideoId -> List Video -> Maybe Video
@@ -70,7 +36,7 @@ getVideo videoId videos =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { tabId = 0
+    ( { tab = SelectVideoTab
       , videoId = Nothing
       , videoIsPlaying = False
       , videoTime = 0
@@ -82,7 +48,7 @@ init () =
 
 type Msg
     = NoOp
-    | TabClicked TabId
+    | TabClicked Tab
     | ListenToVideo VideoId
     | PlayVideo
     | PauseVideo
@@ -100,12 +66,12 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        TabClicked tabId ->
-            ( { model | tabId = tabId }, Cmd.none )
+        TabClicked tab ->
+            ( { model | tab = tab }, Cmd.none )
 
         ListenToVideo videoId ->
             ( { model
-                | tabId = listenTabId
+                | tab = PlayVideoTab
                 , videoId = Just videoId
                 , videoIsPlaying = True
               }
@@ -178,28 +144,49 @@ view model =
     Html.div []
         [ Html.div [ class "fixed w-full" ] [ viewTabs model ]
         , Html.div [ class "pt-24 px-3" ]
-            [ tabs
-                |> List.getAt model.tabId
-                |> Maybe.map (\tab -> tab.content model)
-                |> Maybe.withDefault (Html.text "")
+            [ case model.tab of
+                SelectVideoTab ->
+                    viewFindTab model
+
+                PlayVideoTab ->
+                    viewListenTab model
             ]
         ]
+
+
+type Tab
+    = SelectVideoTab
+    | PlayVideoTab
+
+
+tabs : List Tab
+tabs =
+    [ SelectVideoTab
+    , PlayVideoTab
+    ]
 
 
 viewTabs : Model -> Html Msg
 viewTabs model =
     Html.div [ class "h-16 flex text-xl bg-black" ]
-        (List.indexedMap (viewTab model) tabs)
+        (List.map (viewTab model) tabs)
 
 
-viewTab : Model -> TabId -> TabData -> Html Msg
-viewTab model tabId tab =
+viewTab : Model -> Tab -> Html Msg
+viewTab model tab =
     Html.button
-        [ classList [ ( "text-cyan-400 border-b-2 border-cyan-400", model.tabId == tabId ) ]
+        [ classList [ ( "text-cyan-400 border-b-2 border-cyan-400", model.tab == tab ) ]
         , class "grow h-full flex justify-center items-center cursor-pointer"
-        , onClick (TabClicked tabId)
+        , onClick (TabClicked tab)
         ]
-        [ Html.text tab.text ]
+        [ Html.text <|
+            case tab of
+                SelectVideoTab ->
+                    "Videos"
+
+                PlayVideoTab ->
+                    "Practice"
+        ]
 
 
 viewFindTab : Model -> Html Msg
@@ -215,10 +202,10 @@ viewListenTab model =
             Html.div [ class "flex flex-col items-center" ]
                 [ Html.div [ class "mb-2 text-xl" ] [ Html.text "No video selected" ]
                 , Html.button
-                    [ onClick (TabClicked findTabId)
+                    [ onClick (TabClicked SelectVideoTab)
                     , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
                     ]
-                    [ Html.text "Find a video" ]
+                    [ Html.text "Select a video" ]
                 ]
 
         Just video ->
