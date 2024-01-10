@@ -10,17 +10,106 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
+  <body class="overflow-y-scroll bg-black text-white">
     <div id="root"></div>
+    <div id="player"></div>
     <script src="./build/main.js"></script>
     <script>
+      const INTERVAL_TIME = 100;
+      const RECORDINGS_KEY = "RECORDINGS_KEY";
+      const DEFAULT_VIDEO_ID = "NqucofWlAA4";
+
+      let player;
+      let isPlaying = false;
+      let intervalId = null;
+
       const app = Elm.Main.init({
         node: document.getElementById("root"),
         flags: localStorage.getItem("model"),
       });
-      app.ports.save.subscribe((model) => {
-        localStorage.setItem("model", JSON.stringify(model));
-      });
+      app.ports.startVideo.subscribe(startVideo);
+      app.ports.playVideo.subscribe(playVideo);
+      app.ports.pauseVideo.subscribe(pauseVideo);
+      app.ports.setVideoTime.subscribe(setVideoTime);
+      app.ports.playRecording.subscribe(playRecording);
+      app.ports.loadVideo.subscribe(loadVideo);
+      app.ports.saveRecordings.subscribe(saveRecordings);
+
+      function startVideo(videoId) {
+        if (!player || !player.loadVideoById) return initVideo(videoId);
+        player.loadVideoById(videoId);
+        playVideo();
+      }
+
+      function playVideo() {
+        if (!player) return initVideo();
+        player.playVideo();
+        isPlaying = true;
+        if (!intervalId) {
+          intervalId = setInterval(getVideoTime, INTERVAL_TIME);
+        }
+      }
+
+      function pauseVideo() {
+        if (!player) return initVideo();
+        player.pauseVideo();
+        isPlaying = false;
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+
+      function getVideoTime() {
+        if (!player) return initVideo();
+        app.ports.getVideoTime.send(player.getCurrentTime() || 0);
+      }
+
+      function setVideoTime(videoTime) {
+        if (!player) return initVideo();
+        player.seekTo(videoTime);
+        app.ports.getVideoTime.send(videoTime);
+      }
+
+      function playRecording(recording) {
+        if (!player) return initVideo();
+        player.seekTo(recording.time);
+        playVideo();
+      }
+
+      function loadVideo(videoId) {
+        if (!player || !player.loadVideoById) return initVideo(videoId);
+        player.loadVideoById(videoId);
+        player.seekTo(0);
+        pauseVideo();
+      }
+
+      function initVideo(videoId = DEFAULT_VIDEO_ID) {
+        if (player) return;
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        window.onYouTubeIframeAPIReady = () => {
+          player = new YT.Player("player", {
+            height: 1,
+            width: 1,
+            videoId,
+            playerVars: {
+              playsinline: 1,
+            },
+          });
+        };
+      }
+
+      initVideo();
+
+      function getRecordings() {
+        return localStorage.getItem(RECORDINGS_KEY);
+      }
+
+      function saveRecordings(recordings) {
+        localStorage.setItem(RECORDINGS_KEY, JSON.stringify(recordings));
+      }
     </script>
   </body>
 </html>
