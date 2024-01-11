@@ -193,8 +193,7 @@ viewTab model tab =
 
 viewSelectVideoTab : Model -> Html Msg
 viewSelectVideoTab model =
-    div []
-        (List.map (viewVideoCard model) model.videos)
+    div [] (List.map (viewVideoCard model) model.videos)
 
 
 viewPlayVideoTab : Model -> Html Msg
