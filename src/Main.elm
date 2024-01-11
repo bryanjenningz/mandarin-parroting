@@ -232,9 +232,9 @@ viewPlayVideoTab model =
                     ]
                 , div []
                     [ text
-                        (formatTime model.videoTime
+                        (videoTimeToString model.videoTime
                             ++ " / "
-                            ++ formatTime video.duration
+                            ++ videoTimeToString video.duration
                         )
                     ]
                 , button [ onClick (JumpToSubtitle currentSubtitle) ]
@@ -308,8 +308,8 @@ labeledSymbol label symbol =
         ]
 
 
-formatTime : Float -> String
-formatTime totalSeconds =
+videoTimeToString : VideoTime -> String
+videoTimeToString totalSeconds =
     let
         seconds =
             floor totalSeconds |> modBy 60
