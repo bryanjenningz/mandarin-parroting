@@ -240,21 +240,26 @@ viewPlayVideoTab model =
                     ]
                 , button [ onClick (JumpToSubtitle currentSubtitle) ]
                     [ text currentSubtitle.text ]
-                , div [ class "flex gap-2" ]
-                    [ button
-                        [ onClick FastRewind
-                        , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
-                        ]
-                        [ labeledSymbol "Rewind" "<<" ]
-                    , playButton model [ class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600" ]
-                    , button
-                        [ onClick FastForward
-                        , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
-                        ]
-                        [ labeledSymbol "Fast-forward" ">>" ]
-                    ]
+                , viewVideoControls model
                 , viewSubtitles currentSubtitle video.subtitles
                 ]
+
+
+viewVideoControls : Model -> Html Msg
+viewVideoControls model =
+    div [ class "flex gap-2" ]
+        [ button
+            [ onClick FastRewind
+            , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
+            ]
+            [ labeledSymbol "Rewind" "<<" ]
+        , playButton model [ class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600" ]
+        , button
+            [ onClick FastForward
+            , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
+            ]
+            [ labeledSymbol "Fast-forward" ">>" ]
+        ]
 
 
 viewSubtitles : Subtitle -> List Subtitle -> Html Msg
