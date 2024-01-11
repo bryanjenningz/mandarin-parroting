@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing (Attribute, Html)
+import Html exposing (Attribute, Html, button, div, h2, input, span, text)
 import Html.Attributes as Attr exposing (attribute, class, classList)
 import Html.Events exposing (onClick, onInput)
 import List.Extra as List
@@ -143,9 +143,9 @@ getVideo videoId videos =
 
 view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.div [ class "fixed w-full" ] [ viewTabs model ]
-        , Html.div [ class "pt-24 px-3" ]
+    div []
+        [ div [ class "fixed w-full" ] [ viewTabs model ]
+        , div [ class "pt-24 px-3" ]
             [ case model.tab of
                 SelectVideoTab ->
                     viewSelectVideoTab model
@@ -170,18 +170,18 @@ tabs =
 
 viewTabs : Model -> Html Msg
 viewTabs model =
-    Html.div [ class "h-16 flex text-xl bg-black" ]
+    div [ class "h-16 flex text-xl bg-black" ]
         (List.map (viewTab model) tabs)
 
 
 viewTab : Model -> Tab -> Html Msg
 viewTab model tab =
-    Html.button
+    button
         [ classList [ ( "text-cyan-400 border-b-2 border-cyan-400", model.tab == tab ) ]
         , class "grow h-full flex justify-center items-center cursor-pointer"
         , onClick (TabClicked tab)
         ]
-        [ Html.text <|
+        [ text <|
             case tab of
                 SelectVideoTab ->
                     "Videos"
@@ -193,7 +193,7 @@ viewTab model tab =
 
 viewSelectVideoTab : Model -> Html Msg
 viewSelectVideoTab model =
-    Html.div []
+    div []
         (List.map (viewVideoCard model) model.videos)
 
 
@@ -201,13 +201,13 @@ viewPlayVideoTab : Model -> Html Msg
 viewPlayVideoTab model =
     case getVideo model.videoId model.videos of
         Nothing ->
-            Html.div [ class "flex flex-col items-center" ]
-                [ Html.div [ class "mb-2 text-xl" ] [ Html.text "No video selected" ]
-                , Html.button
+            div [ class "flex flex-col items-center" ]
+                [ div [ class "mb-2 text-xl" ] [ text "No video selected" ]
+                , button
                     [ onClick (TabClicked SelectVideoTab)
                     , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
                     ]
-                    [ Html.text "Select a video" ]
+                    [ text "Select a video" ]
                 ]
 
         Just video ->
@@ -216,11 +216,11 @@ viewPlayVideoTab model =
                     Video.subtitleAt model.videoTime video.subtitles
                         |> Maybe.withDefault (Subtitle "" "" -1)
             in
-            Html.div [ class "flex flex-col items-center gap-2 h-full" ]
-                [ Html.div [ class "text-xl text-center" ]
-                    [ Html.text video.title ]
-                , Html.div [ class "w-full" ]
-                    [ Html.input
+            div [ class "flex flex-col items-center gap-2 h-full" ]
+                [ div [ class "text-xl text-center" ]
+                    [ text video.title ]
+                , div [ class "w-full" ]
+                    [ input
                         [ Attr.type_ "range"
                         , Attr.min "0"
                         , Attr.max (String.fromFloat video.duration)
@@ -231,40 +231,40 @@ viewPlayVideoTab model =
                         ]
                         []
                     ]
-                , Html.div []
-                    [ Html.text
+                , div []
+                    [ text
                         (formatTime model.videoTime
                             ++ " / "
                             ++ formatTime video.duration
                         )
                     ]
-                , Html.button [ onClick (JumpToSubtitle currentSubtitle) ]
-                    [ Html.text currentSubtitle.text ]
-                , Html.div [ class "flex gap-2" ]
-                    [ Html.button
+                , button [ onClick (JumpToSubtitle currentSubtitle) ]
+                    [ text currentSubtitle.text ]
+                , div [ class "flex gap-2" ]
+                    [ button
                         [ onClick FastRewind
                         , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
                         ]
                         [ labeledSymbol "Rewind" "<<" ]
                     , playButton model [ class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600" ]
-                    , Html.button
+                    , button
                         [ onClick FastForward
                         , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
                         ]
                         [ labeledSymbol "Fast-forward" ">>" ]
                     ]
-                , Html.div [ Attr.id subtitlesContainerId, class "overflow-y-scroll h-1/2 md:h-3/5" ]
+                , div [ Attr.id subtitlesContainerId, class "overflow-y-scroll h-1/2 md:h-3/5" ]
                     (video.subtitles
                         |> List.map
                             (\subtitle ->
-                                Html.div
+                                div
                                     [ class "text-center"
                                     , classList
                                         [ ( "text-cyan-300", subtitle == currentSubtitle ) ]
                                     , onClick (SetVideoTime subtitle.time)
                                     , Attr.id (subtitleId subtitle)
                                     ]
-                                    [ Html.text subtitle.text ]
+                                    [ text subtitle.text ]
                             )
                     )
                 ]
@@ -303,9 +303,9 @@ jumpToSubtitle subtitle =
 
 labeledSymbol : String -> String -> Html msg
 labeledSymbol label symbol =
-    Html.span []
-        [ Html.span [ attribute "aria-hidden" "true" ] [ Html.text symbol ]
-        , Html.span [ class "sr-only" ] [ Html.text label ]
+    span []
+        [ span [ attribute "aria-hidden" "true" ] [ text symbol ]
+        , span [ class "sr-only" ] [ text label ]
         ]
 
 
@@ -328,20 +328,20 @@ formatTime totalSeconds =
 
 viewVideoCard : Model -> Video -> Html Msg
 viewVideoCard model video =
-    Html.div [ class "px-5 py-5 mb-4 shadow shadow-slate-100 mx-auto w-full md:w-3/4 lg:w-1/2" ]
-        [ Html.div []
-            [ Html.h2 [ class "text-xl mb-3" ] [ Html.text video.title ]
-            , Html.div [ class "flex justify-between" ]
-                [ Html.button
+    div [ class "px-5 py-5 mb-4 shadow shadow-slate-100 mx-auto w-full md:w-3/4 lg:w-1/2" ]
+        [ div []
+            [ h2 [ class "text-xl mb-3" ] [ text video.title ]
+            , div [ class "flex justify-between" ]
+                [ button
                     [ onClick (StartVideo video.id)
                     , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
                     ]
-                    [ Html.text "Listen" ]
+                    [ text "Listen" ]
                 , if model.videoId == Just video.id then
                     playButton model [ class "bg-cyan-500 hover:bg-cyan-600 w-12 h-12" ]
 
                   else
-                    Html.text ""
+                    text ""
                 ]
             ]
         ]
@@ -350,11 +350,11 @@ viewVideoCard model video =
 playButton : Model -> List (Attribute Msg) -> Html Msg
 playButton model attributes =
     if model.videoIsPlaying then
-        Html.button (attributes ++ [ onClick PauseVideo ])
+        button (attributes ++ [ onClick PauseVideo ])
             [ labeledSymbol "Pause" "||" ]
 
     else
-        Html.button (attributes ++ [ onClick PlayVideo ])
+        button (attributes ++ [ onClick PlayVideo ])
             [ labeledSymbol "Play" "▶" ]
 
 
@@ -376,7 +376,7 @@ port playVideo : () -> Cmd msg
 port pauseVideo : () -> Cmd msg
 
 
-port getVideoTime : (Float -> msg) -> Sub msg
+port getVideoTime : (VideoTime -> msg) -> Sub msg
 
 
-port setVideoTime : Float -> Cmd msg
+port setVideoTime : VideoTime -> Cmd msg
