@@ -52,7 +52,7 @@ init () =
 type Msg
     = NoOp
     | TabClicked Tab
-    | ListenToVideo VideoId
+    | StartVideo VideoId
     | PlayVideo
     | PauseVideo
     | FastForward
@@ -71,7 +71,7 @@ update msg model =
         TabClicked tab ->
             ( { model | tab = tab }, Cmd.none )
 
-        ListenToVideo videoId ->
+        StartVideo videoId ->
             ( { model
                 | tab = PlayVideoTab
                 , videoId = Just videoId
@@ -333,7 +333,7 @@ viewVideoCard model video =
             [ Html.h2 [ class "text-xl mb-3" ] [ Html.text video.title ]
             , Html.div [ class "flex justify-between" ]
                 [ Html.button
-                    [ onClick (ListenToVideo video.id)
+                    [ onClick (StartVideo video.id)
                     , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
                     ]
                     [ Html.text "Listen" ]
