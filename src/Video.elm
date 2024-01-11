@@ -1,4 +1,4 @@
-module Video exposing (Subtitle, Video, VideoId, VideoTime, decode, nextSubtitle, prevSubtitle, subtitleAt)
+module Video exposing (Subtitle, Video, VideoId, VideoTime, nextSubtitle, prevSubtitle, subtitleAt)
 
 import Dict
 import Json.Decode as Json
