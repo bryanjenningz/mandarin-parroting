@@ -1,4 +1,4 @@
-module NewVideo exposing (NewVideo, view)
+module NewVideo exposing (Error(..), NewVideo, empty, view)
 
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (for, id)
@@ -8,6 +8,13 @@ import Html.Events exposing (onClick, onInput)
 type alias NewVideo =
     { newVideoId : String
     , newVideoTranscript : String
+    }
+
+
+empty : NewVideo
+empty =
+    { newVideoId = ""
+    , newVideoTranscript = ""
     }
 
 
@@ -43,3 +50,10 @@ view props =
         , button [ onClick props.submitNewVideo ]
             [ text "Add video" ]
         ]
+
+
+type Error
+    = EmptyVideoId
+    | InvalidVideoId
+    | EmptyTranscript
+    | InvalidTranscript

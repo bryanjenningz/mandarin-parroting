@@ -6,6 +6,7 @@ import Html exposing (Attribute, Html, button, div, h2, input, span, text)
 import Html.Attributes as Attr exposing (attribute, class, classList)
 import Html.Events exposing (onClick, onInput)
 import List.Extra as List
+import NewVideo exposing (NewVideo)
 import Task
 import Video exposing (Subtitle, Video, VideoId)
 import VideoTime exposing (VideoTime)
@@ -31,6 +32,8 @@ type alias Model =
     , videoIsPlaying : Bool
     , videoTime : VideoTime
     , videos : List Video
+    , newVideo : NewVideo
+    , newVideoError : Maybe NewVideo.Error
     }
 
 
@@ -41,6 +44,8 @@ init () =
       , videoIsPlaying = False
       , videoTime = 0
       , videos = []
+      , newVideo = NewVideo.empty
+      , newVideoError = Nothing
       }
     , Cmd.none
     )
@@ -61,6 +66,10 @@ type Msg
     | GetVideoTime VideoTime
     | SetVideoTime VideoTime
     | JumpToSubtitle Subtitle
+    | SetNewVideoId VideoId
+    | SetNewVideoTranscript String
+    | SubmitNewVideo
+    | AddVideo Video
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -132,6 +141,37 @@ update msg model =
         JumpToSubtitle subtitle ->
             ( model, jumpToSubtitle subtitle )
 
+        SetNewVideoId newVideoId ->
+            let
+                newVideo =
+                    model.newVideo
+            in
+            ( { model | newVideo = { newVideo | newVideoId = newVideoId } }
+            , Cmd.none
+            )
+
+        SetNewVideoTranscript newVideoTranscript ->
+            let
+                newVideo =
+                    model.newVideo
+            in
+            ( { model | newVideo = { newVideo | newVideoTranscript = newVideoTranscript } }
+            , Cmd.none
+            )
+
+        SubmitNewVideo ->
+            if String.isEmpty (String.trim model.newVideo.newVideoId) then
+                ( { model | newVideoError = Just NewVideo.EmptyVideoId }, Cmd.none )
+
+            else if String.isEmpty (String.trim model.newVideo.newVideoTranscript) then
+                ( { model | newVideoError = Just NewVideo.EmptyTranscript }, Cmd.none )
+
+            else
+                ( model, addNewVideo model.newVideo.newVideoId )
+
+        AddVideo video ->
+            ( { model | videos = model.videos ++ [ video ] }, Cmd.none )
+
 
 getVideo : Maybe VideoId -> List Video -> Maybe Video
 getVideo videoId videos =
@@ -194,7 +234,14 @@ viewTab model tab =
 
 viewSelectVideoTab : Model -> Html Msg
 viewSelectVideoTab model =
-    div [] (List.map (viewVideoCard model) model.videos)
+    div []
+        [ NewVideo.view
+            { setNewVideoId = SetNewVideoId
+            , setNewVideoTranscript = SetNewVideoTranscript
+            , submitNewVideo = SubmitNewVideo
+            }
+        , div [] (List.map (viewVideoCard model) model.videos)
+        ]
 
 
 viewPlayVideoTab : Model -> Html Msg
@@ -367,7 +414,10 @@ playButton model attributes =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    getVideoTime GetVideoTime
+    Sub.batch
+        [ getVideoTime GetVideoTime
+        , addVideo AddVideo
+        ]
 
 
 port startVideo : VideoId -> Cmd msg
@@ -383,3 +433,9 @@ port getVideoTime : (VideoTime -> msg) -> Sub msg
 
 
 port setVideoTime : VideoTime -> Cmd msg
+
+
+port addNewVideo : VideoId -> Cmd msg
+
+
+port addVideo : (Video -> msg) -> Sub msg

@@ -31,6 +31,7 @@
       app.ports.playVideo.subscribe(playVideo);
       app.ports.pauseVideo.subscribe(pauseVideo);
       app.ports.setVideoTime.subscribe(setVideoTime);
+      app.ports.addNewVideo.subscribe(addNewVideo);
 
       function startVideo(videoId) {
         if (!player || !player.loadVideoById) return initVideo(videoId);
@@ -64,6 +65,22 @@
         if (!player) return initVideo();
         player.seekTo(videoTime);
         app.ports.getVideoTime.send(videoTime);
+      }
+
+      function addNewVideo(videoId, subtitles) {
+        if (!player) {
+          initVideo();
+          return setTimeout(
+            () => addNewVideo(videoId, subtitles),
+            INTERVAL_TIME
+          );
+        }
+        app.ports.addVideo({
+          id: videoId,
+          title: player.getVideoData().title,
+          duration: player.getDuration(),
+          subtitles,
+        });
       }
 
       function initVideo(videoId = DEFAULT_VIDEO_ID) {
