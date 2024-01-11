@@ -31,7 +31,6 @@
       app.ports.playVideo.subscribe(playVideo);
       app.ports.pauseVideo.subscribe(pauseVideo);
       app.ports.setVideoTime.subscribe(setVideoTime);
-      app.ports.loadVideo.subscribe(loadVideo);
 
       function startVideo(videoId) {
         if (!player || !player.loadVideoById) return initVideo(videoId);
@@ -65,13 +64,6 @@
         if (!player) return initVideo();
         player.seekTo(videoTime);
         app.ports.getVideoTime.send(videoTime);
-      }
-
-      function loadVideo(videoId) {
-        if (!player || !player.loadVideoById) return initVideo(videoId);
-        player.loadVideoById(videoId);
-        player.seekTo(0);
-        pauseVideo();
       }
 
       function initVideo(videoId = DEFAULT_VIDEO_ID) {

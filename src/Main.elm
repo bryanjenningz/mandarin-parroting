@@ -59,7 +59,6 @@ type Msg
     | FastRewind
     | GetVideoTime VideoTime
     | SetVideoTime VideoTime
-    | LoadVideo VideoId
     | JumpToSubtitle Subtitle
 
 
@@ -128,15 +127,6 @@ update msg model =
 
         SetVideoTime videoTime ->
             ( model, setVideoTime videoTime )
-
-        LoadVideo videoId ->
-            ( { model
-                | videoId = Just videoId
-                , videoIsPlaying = False
-                , videoTime = 0
-              }
-            , loadVideo videoId
-            )
 
         JumpToSubtitle subtitle ->
             ( model, jumpToSubtitle subtitle )
@@ -390,6 +380,3 @@ port getVideoTime : (Float -> msg) -> Sub msg
 
 
 port setVideoTime : Float -> Cmd msg
-
-
-port loadVideo : String -> Cmd msg
