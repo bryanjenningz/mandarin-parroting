@@ -217,20 +217,8 @@ viewPlayVideoTab model =
                         |> Maybe.withDefault (Subtitle "" "" -1)
             in
             div [ class "flex flex-col items-center gap-2 h-full" ]
-                [ div [ class "text-xl text-center" ]
-                    [ text video.title ]
-                , div [ class "w-full" ]
-                    [ input
-                        [ Attr.type_ "range"
-                        , Attr.min "0"
-                        , Attr.max (String.fromFloat video.duration)
-                        , Attr.step "1"
-                        , Attr.value (String.fromFloat model.videoTime)
-                        , onInput (String.toFloat >> Maybe.map SetVideoTime >> Maybe.withDefault (SetVideoTime 0))
-                        , class "block w-full md:w-3/4 lg:w-1/2 mx-auto"
-                        ]
-                        []
-                    ]
+                [ div [ class "text-xl text-center" ] [ text video.title ]
+                , viewVideoSlider model.videoTime video
                 , div []
                     [ text
                         (VideoTime.toString model.videoTime
@@ -243,6 +231,28 @@ viewPlayVideoTab model =
                 , viewVideoControls model
                 , viewSubtitles currentSubtitle video.subtitles
                 ]
+
+
+viewVideoSlider : VideoTime -> Video -> Html Msg
+viewVideoSlider videoTime video =
+    div [ class "w-full" ]
+        [ input
+            [ Attr.type_ "range"
+            , Attr.min "0"
+            , Attr.max (String.fromFloat video.duration)
+            , Attr.step "1"
+            , Attr.value (String.fromFloat videoTime)
+            , onInput
+                (\inputText ->
+                    inputText
+                        |> String.toFloat
+                        |> Maybe.map SetVideoTime
+                        |> Maybe.withDefault (SetVideoTime 0)
+                )
+            , class "block w-full md:w-3/4 lg:w-1/2 mx-auto"
+            ]
+            []
+        ]
 
 
 viewVideoControls : Model -> Html Msg
