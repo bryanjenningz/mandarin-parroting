@@ -350,7 +350,7 @@ subscriptions _ =
     getVideoTime GetVideoTime
 
 
-port startVideo : String -> Cmd msg
+port startVideo : VideoId -> Cmd msg
 
 
 port playVideo : () -> Cmd msg
