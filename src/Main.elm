@@ -253,21 +253,26 @@ viewPlayVideoTab model =
                         ]
                         [ labeledSymbol "Fast-forward" ">>" ]
                     ]
-                , div [ Attr.id subtitlesContainerId, class "overflow-y-scroll h-1/2 md:h-3/5" ]
-                    (video.subtitles
-                        |> List.map
-                            (\subtitle ->
-                                div
-                                    [ class "text-center"
-                                    , classList
-                                        [ ( "text-cyan-300", subtitle == currentSubtitle ) ]
-                                    , onClick (SetVideoTime subtitle.time)
-                                    , Attr.id (subtitleId subtitle)
-                                    ]
-                                    [ text subtitle.text ]
-                            )
-                    )
+                , viewSubtitles currentSubtitle video.subtitles
                 ]
+
+
+viewSubtitles : Subtitle -> List Subtitle -> Html Msg
+viewSubtitles currentSubtitle subtitles =
+    div [ Attr.id subtitlesContainerId, class "overflow-y-scroll h-1/2 md:h-3/5" ]
+        (subtitles
+            |> List.map
+                (\subtitle ->
+                    div
+                        [ class "text-center"
+                        , classList
+                            [ ( "text-cyan-300", subtitle == currentSubtitle ) ]
+                        , onClick (SetVideoTime subtitle.time)
+                        , Attr.id (subtitleId subtitle)
+                        ]
+                        [ text subtitle.text ]
+                )
+        )
 
 
 subtitlesContainerId : String
