@@ -1,14 +1,11 @@
-module Video exposing (Subtitle, Video, VideoId, VideoTime, nextSubtitle, prevSubtitle, subtitleAt)
+module Video exposing (Subtitle, Video, VideoId, nextSubtitle, prevSubtitle, subtitleAt)
 
 import List.Extra as List
+import VideoTime exposing (VideoTime)
 
 
 type alias VideoId =
     String
-
-
-type alias VideoTime =
-    Float
 
 
 type alias Video =

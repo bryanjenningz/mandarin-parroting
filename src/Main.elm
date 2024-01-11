@@ -7,7 +7,8 @@ import Html.Attributes as Attr exposing (attribute, class, classList)
 import Html.Events exposing (onClick, onInput)
 import List.Extra as List
 import Task
-import Video exposing (Subtitle, Video, VideoId, VideoTime)
+import Video exposing (Subtitle, Video, VideoId)
+import VideoTime exposing (VideoTime)
 
 
 main : Program () Model Msg
@@ -232,9 +233,9 @@ viewPlayVideoTab model =
                     ]
                 , div []
                     [ text
-                        (videoTimeToString model.videoTime
+                        (VideoTime.toString model.videoTime
                             ++ " / "
-                            ++ videoTimeToString video.duration
+                            ++ VideoTime.toString video.duration
                         )
                     ]
                 , button [ onClick (JumpToSubtitle currentSubtitle) ]
@@ -306,23 +307,6 @@ labeledSymbol label symbol =
         [ span [ attribute "aria-hidden" "true" ] [ text symbol ]
         , span [ class "sr-only" ] [ text label ]
         ]
-
-
-videoTimeToString : VideoTime -> String
-videoTimeToString totalSeconds =
-    let
-        seconds =
-            floor totalSeconds |> modBy 60
-
-        minutes =
-            (floor totalSeconds // 60) |> modBy 60
-
-        hours =
-            floor totalSeconds // 60 // 60
-    in
-    [ hours, minutes, seconds ]
-        |> List.map (String.fromInt >> String.padLeft 2 '0' >> String.right 2)
-        |> String.join ":"
 
 
 viewVideoCard : Model -> Video -> Html Msg
