@@ -17,8 +17,7 @@ type alias Video =
 
 
 type alias Subtitle =
-    { videoId : VideoId
-    , text : String
+    { text : String
     , time : VideoTime
     }
 

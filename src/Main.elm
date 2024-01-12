@@ -258,7 +258,6 @@ viewPlayVideoTab model =
             let
                 currentSubtitle =
                     Video.subtitleAt model.videoTime video.subtitles
-                        |> Maybe.withDefault (Subtitle "" "" -1)
             in
             div [ class "flex flex-col items-center gap-2 h-full" ]
                 [ div [ class "text-xl text-center" ] [ text video.title ]
@@ -270,10 +269,20 @@ viewPlayVideoTab model =
                             ++ VideoTime.toString video.duration
                         )
                     ]
-                , button [ onClick (JumpToSubtitle currentSubtitle) ]
-                    [ text currentSubtitle.text ]
+                , case currentSubtitle of
+                    Nothing ->
+                        text ""
+
+                    Just subtitle ->
+                        button [ onClick (JumpToSubtitle subtitle) ]
+                            [ text subtitle.text ]
                 , viewVideoControls model
-                , viewSubtitles currentSubtitle video.subtitles
+                , case currentSubtitle of
+                    Nothing ->
+                        text ""
+
+                    Just subtitle ->
+                        viewSubtitles subtitle video.subtitles
                 ]
 
 
