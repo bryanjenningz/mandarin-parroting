@@ -234,7 +234,7 @@ viewTab model tab =
 
 viewSelectVideoTab : Model -> Html Msg
 viewSelectVideoTab model =
-    div []
+    div [ class "flex flex-col items-center" ]
         [ NewVideo.view
             { setNewVideoId = SetNewVideoId
             , setNewVideoTranscript = SetNewVideoTranscript
