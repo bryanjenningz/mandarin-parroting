@@ -218,8 +218,11 @@ viewTabs model =
 viewTab : Model -> Tab -> Html Msg
 viewTab model tab =
     button
-        [ classList [ ( "text-cyan-400 border-b-2 border-cyan-400", model.tab == tab ) ]
-        , class "grow h-full flex justify-center items-center cursor-pointer"
+        [ classList
+            [ ( "text-blue-400 border-blue-400", model.tab == tab )
+            , ( "text-white border-black", model.tab /= tab )
+            ]
+        , class "grow h-full flex justify-center items-center cursor-pointer border-b-2"
         , onClick (TabClicked tab)
         ]
         [ text <|
