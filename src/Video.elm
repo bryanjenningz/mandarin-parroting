@@ -9,7 +9,7 @@ type alias VideoId =
 
 
 type alias Video =
-    { id : VideoId
+    { videoId : VideoId
     , title : String
     , duration : VideoTime
     , subtitles : List Subtitle

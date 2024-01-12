@@ -167,7 +167,7 @@ update msg model =
 
 getVideo : Maybe VideoId -> List Video -> Maybe Video
 getVideo videoId videos =
-    videoId |> Maybe.andThen (\id -> List.find (.id >> (==) id) videos)
+    videoId |> Maybe.andThen (\id -> List.find (.videoId >> (==) id) videos)
 
 
 
@@ -380,11 +380,11 @@ viewVideoCard model video =
             [ h2 [ class "text-xl mb-3" ] [ text video.title ]
             , div [ class "flex justify-between" ]
                 [ button
-                    [ onClick (StartVideo video.id)
+                    [ onClick (StartVideo video.videoId)
                     , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
                     ]
                     [ text "Listen" ]
-                , if model.videoId == Just video.id then
+                , if model.videoId == Just video.videoId then
                     playButton model [ class "bg-cyan-500 hover:bg-cyan-600 w-12 h-12" ]
 
                   else
