@@ -42,6 +42,7 @@ setTranscript transcript (NewVideo newVideo) =
 type Error
     = EmptyVideoId
     | EmptyTranscript
+    | InvalidTranscript
 
 
 type ValidNewVideo
@@ -60,7 +61,17 @@ validate (NewVideo newVideo) =
         Err EmptyTranscript
 
     else
-        Ok (ValidNewVideo { videoId = newVideo.newVideoId, subtitles = [] })
+        case transcriptToSubtitles newVideo.newVideoTranscript of
+            Nothing ->
+                Err InvalidTranscript
+
+            Just subtitles ->
+                Ok (ValidNewVideo { videoId = newVideo.newVideoId, subtitles = subtitles })
+
+
+transcriptToSubtitles : String -> Maybe (List Subtitle)
+transcriptToSubtitles _ =
+    Nothing
 
 
 encode : ValidNewVideo -> { videoId : String, subtitles : List Subtitle }
