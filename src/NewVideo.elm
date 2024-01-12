@@ -1,7 +1,7 @@
 module NewVideo exposing (Error(..), NewVideo, empty, view)
 
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
-import Html.Attributes exposing (for, id)
+import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
 
 
@@ -34,6 +34,7 @@ view props =
                 [ text "New video ID" ]
             , input
                 [ id "new-video-id-input"
+                , class "bg-slate-700 p-2 rounded-lg"
                 , onInput props.setNewVideoId
                 ]
                 []
@@ -43,11 +44,15 @@ view props =
                 [ text "New video transcript" ]
             , textarea
                 [ id "new-video-transcript-textarea"
+                , class "bg-slate-700 p-2 rounded-lg resize-y"
                 , onInput props.setNewVideoTranscript
                 ]
                 []
             ]
-        , button [ onClick props.submitNewVideo ]
+        , button
+            [ class "bg-blue-600 py-2 px-4 rounded-lg"
+            , onClick props.submitNewVideo
+            ]
             [ text "Add video" ]
         ]
 
