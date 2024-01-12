@@ -6,6 +6,10 @@ import Html.Events exposing (onClick, onInput)
 import Video exposing (Subtitle, VideoId)
 
 
+
+-- NEW VIDEO
+
+
 type NewVideo
     = NewVideo
         { newVideoId : String
@@ -31,21 +35,43 @@ setTranscript transcript (NewVideo newVideo) =
     NewVideo { newVideo | newVideoTranscript = transcript }
 
 
-validate : NewVideo -> Maybe Error
+
+-- VALIDATE
+
+
+type Error
+    = EmptyVideoId
+    | InvalidVideoId
+    | EmptyTranscript
+    | InvalidTranscript
+
+
+type ValidNewVideo
+    = ValidNewVideo
+        { videoId : String
+        , subtitles : List Subtitle
+        }
+
+
+validate : NewVideo -> Result Error ValidNewVideo
 validate (NewVideo newVideo) =
     if String.isEmpty (String.trim newVideo.newVideoId) then
-        Just EmptyVideoId
+        Err EmptyVideoId
 
     else if String.isEmpty (String.trim newVideo.newVideoTranscript) then
-        Just EmptyTranscript
+        Err EmptyTranscript
 
     else
-        Nothing
+        Ok (ValidNewVideo { videoId = newVideo.newVideoId, subtitles = [] })
 
 
-encode : NewVideo -> { videoId : String, subtitles : List Subtitle }
-encode (NewVideo newVideo) =
-    { videoId = newVideo.newVideoId, subtitles = [] }
+encode : ValidNewVideo -> { videoId : String, subtitles : List Subtitle }
+encode (ValidNewVideo newVideo) =
+    newVideo
+
+
+
+-- VIEW
 
 
 type alias ViewProps msg =
@@ -85,10 +111,3 @@ view props =
             ]
             [ text "Add video" ]
         ]
-
-
-type Error
-    = EmptyVideoId
-    | InvalidVideoId
-    | EmptyTranscript
-    | InvalidTranscript

@@ -153,10 +153,12 @@ update msg model =
 
         SubmitNewVideo ->
             case NewVideo.validate model.newVideo of
-                Nothing ->
-                    ( model, submitNewVideo (NewVideo.encode model.newVideo) )
+                Ok validNewVideo ->
+                    ( { model | newVideoError = Nothing }
+                    , submitNewVideo (NewVideo.encode validNewVideo)
+                    )
 
-                Just error ->
+                Err error ->
                     ( { model | newVideoError = Just error }, Cmd.none )
 
         AddVideo video ->
