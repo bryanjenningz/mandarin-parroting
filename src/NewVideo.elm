@@ -1,21 +1,51 @@
-module NewVideo exposing (Error(..), NewVideo, empty, view)
+module NewVideo exposing (Error(..), NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
 
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
+import Video exposing (Subtitle, VideoId)
 
 
-type alias NewVideo =
-    { newVideoId : String
-    , newVideoTranscript : String
-    }
+type NewVideo
+    = NewVideo
+        { newVideoId : String
+        , newVideoTranscript : String
+        }
 
 
 empty : NewVideo
 empty =
-    { newVideoId = ""
-    , newVideoTranscript = ""
-    }
+    NewVideo
+        { newVideoId = ""
+        , newVideoTranscript = ""
+        }
+
+
+setVideoId : VideoId -> NewVideo -> NewVideo
+setVideoId videoId (NewVideo newVideo) =
+    NewVideo { newVideo | newVideoId = videoId }
+
+
+setTranscript : String -> NewVideo -> NewVideo
+setTranscript transcript (NewVideo newVideo) =
+    NewVideo { newVideo | newVideoTranscript = transcript }
+
+
+validate : NewVideo -> Maybe Error
+validate (NewVideo newVideo) =
+    if String.isEmpty (String.trim newVideo.newVideoId) then
+        Just EmptyVideoId
+
+    else if String.isEmpty (String.trim newVideo.newVideoTranscript) then
+        Just EmptyTranscript
+
+    else
+        Nothing
+
+
+encode : NewVideo -> { videoId : String, subtitles : List Subtitle }
+encode (NewVideo newVideo) =
+    { videoId = newVideo.newVideoId, subtitles = [] }
 
 
 type alias ViewProps msg =

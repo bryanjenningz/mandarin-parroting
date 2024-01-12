@@ -31,7 +31,7 @@
       app.ports.playVideo.subscribe(playVideo);
       app.ports.pauseVideo.subscribe(pauseVideo);
       app.ports.setVideoTime.subscribe(setVideoTime);
-      app.ports.addNewVideo.subscribe(addNewVideo);
+      app.ports.submitNewVideo.subscribe(submitNewVideo);
 
       function startVideo(videoId) {
         if (!player || !player.loadVideoById) return initVideo(videoId);
@@ -67,13 +67,15 @@
         app.ports.getVideoTime.send(videoTime);
       }
 
-      function addNewVideo(videoId, subtitles) {
+      function submitNewVideo(data) {
         if (!player) {
           initVideo();
-          return setTimeout(
-            () => addNewVideo(videoId, subtitles),
-            INTERVAL_TIME
-          );
+          return setTimeout(() => submitNewVideo(data), INTERVAL_TIME);
+        }
+        const { videoId, subtitles } = data;
+        if (player.getVideoData().id !== videoId) {
+          player.loadVideoById(videoId);
+          return setTimeout(() => submitNewVideo(data), INTERVAL_TIME);
         }
         app.ports.addVideo({
           id: videoId,

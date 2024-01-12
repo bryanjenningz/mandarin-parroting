@@ -142,32 +142,22 @@ update msg model =
             ( model, jumpToSubtitle subtitle )
 
         SetNewVideoId newVideoId ->
-            let
-                newVideo =
-                    model.newVideo
-            in
-            ( { model | newVideo = { newVideo | newVideoId = newVideoId } }
+            ( { model | newVideo = NewVideo.setVideoId newVideoId model.newVideo }
             , Cmd.none
             )
 
         SetNewVideoTranscript newVideoTranscript ->
-            let
-                newVideo =
-                    model.newVideo
-            in
-            ( { model | newVideo = { newVideo | newVideoTranscript = newVideoTranscript } }
+            ( { model | newVideo = NewVideo.setTranscript newVideoTranscript model.newVideo }
             , Cmd.none
             )
 
         SubmitNewVideo ->
-            if String.isEmpty (String.trim model.newVideo.newVideoId) then
-                ( { model | newVideoError = Just NewVideo.EmptyVideoId }, Cmd.none )
+            case NewVideo.validate model.newVideo of
+                Nothing ->
+                    ( model, submitNewVideo (NewVideo.encode model.newVideo) )
 
-            else if String.isEmpty (String.trim model.newVideo.newVideoTranscript) then
-                ( { model | newVideoError = Just NewVideo.EmptyTranscript }, Cmd.none )
-
-            else
-                ( model, addNewVideo model.newVideo.newVideoId )
+                Just error ->
+                    ( { model | newVideoError = Just error }, Cmd.none )
 
         AddVideo video ->
             ( { model | videos = model.videos ++ [ video ] }, Cmd.none )
@@ -440,7 +430,7 @@ port getVideoTime : (VideoTime -> msg) -> Sub msg
 port setVideoTime : VideoTime -> Cmd msg
 
 
-port addNewVideo : VideoId -> Cmd msg
+port submitNewVideo : { videoId : String, subtitles : List Subtitle } -> Cmd msg
 
 
 port addVideo : (Video -> msg) -> Sub msg
