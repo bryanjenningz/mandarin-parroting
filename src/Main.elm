@@ -252,12 +252,14 @@ viewPlayVideoTab model =
     case getVideo model.videoId model.videos of
         Nothing ->
             div [ class "flex flex-col items-center" ]
-                [ div [ class "mb-2 text-xl" ] [ text "No video selected" ]
-                , button
-                    [ onClick (TabClicked SelectVideoTab)
-                    , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
+                [ div [ class "w-full max-w-2xl flex flex-col items-center gap-4" ]
+                    [ h2 [ class "text-2xl" ] [ text "No video selected" ]
+                    , button
+                        [ onClick (TabClicked SelectVideoTab)
+                        , class "w-full py-2 px-4 bg-blue-600 rounded-lg"
+                        ]
+                        [ text "Select a video" ]
                     ]
-                    [ text "Select a video" ]
                 ]
 
         Just video ->
