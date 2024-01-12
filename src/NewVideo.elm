@@ -27,10 +27,10 @@ type alias ViewProps msg =
 
 view : ViewProps msg -> Html msg
 view props =
-    article []
-        [ h2 [] [ text "Add a new video" ]
-        , div []
-            [ label [ for "new-video-id-input" ]
+    article [ class "w-full max-w-2xl flex flex-col gap-4" ]
+        [ h2 [ class "text-2xl" ] [ text "Add a new video" ]
+        , div [ class "flex flex-col" ]
+            [ label [ class "text-xs", for "new-video-id-input" ]
                 [ text "New video ID" ]
             , input
                 [ id "new-video-id-input"
@@ -39,8 +39,8 @@ view props =
                 ]
                 []
             ]
-        , div []
-            [ label [ for "new-video-transcript-textarea" ]
+        , div [ class "flex flex-col" ]
+            [ label [ class "text-xs", for "new-video-transcript-textarea" ]
                 [ text "New video transcript" ]
             , textarea
                 [ id "new-video-transcript-textarea"
