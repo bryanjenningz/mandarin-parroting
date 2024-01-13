@@ -333,7 +333,7 @@ viewVideoSlider videoTime video =
 
 viewVideoControls : Model -> Html Msg
 viewVideoControls model =
-    div [ class "w-full flex gap-2 justify-between" ]
+    div [ class "w-full flex justify-between gap-2" ]
         [ div [ class "basis-1 grow" ] []
         , div [ class "flex gap-2" ]
             [ button
@@ -348,13 +348,14 @@ viewVideoControls model =
                 ]
                 [ labeledSymbol "Fast-forward" ">>" ]
             ]
-        , viewVideoSpeed model.videoSpeed
+        , div [ class "basis-1 grow" ]
+            [ viewVideoSpeed model.videoSpeed ]
         ]
 
 
 viewVideoSpeed : Int -> Html Msg
 viewVideoSpeed videoSpeed =
-    div [ class "flex items-center gap-1 basis-1 grow justify-end" ]
+    div [ class "flex justify-end items-center gap-1" ]
         [ button
             [ onClick (SetVideoSpeed (videoSpeed - 5))
             , class "bg-blue-600 rounded-lg w-6 h-12"
