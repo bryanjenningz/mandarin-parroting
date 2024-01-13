@@ -247,12 +247,25 @@ viewPlayVideoTab model =
         Nothing ->
             div [ class "flex flex-col items-center" ]
                 [ div [ class "w-full max-w-2xl flex flex-col items-center gap-4" ]
-                    [ h2 [ class "text-2xl" ] [ text "No video selected" ]
+                    [ h2 [ class "text-2xl" ]
+                        [ text <|
+                            if List.isEmpty model.videos then
+                                "You haven't added any videos yet."
+
+                            else
+                                "You haven't selected a video."
+                        ]
                     , button
                         [ onClick (TabClicked SelectVideoTab)
                         , class "w-full py-2 px-4 bg-blue-600 rounded-lg"
                         ]
-                        [ text "Select a video" ]
+                        [ text <|
+                            if List.isEmpty model.videos then
+                                "Add a video"
+
+                            else
+                                "Select a video"
+                        ]
                     ]
                 ]
 
