@@ -89,7 +89,11 @@ transcriptToSubtitlesTests =
 timeParserTests : Test
 timeParserTests =
     describe "NewVideo.timeParser"
-        [ test "Parses 1:23 as 83" <|
+        [ test "Parses 0:12 as 12" <|
+            \_ ->
+                Parser.run NewVideo.timeParser "0:12"
+                    |> Expect.equal (Ok 12)
+        , test "Parses 1:23 as 83" <|
             \_ ->
                 Parser.run NewVideo.timeParser "1:23"
                     |> Expect.equal (Ok 83)
