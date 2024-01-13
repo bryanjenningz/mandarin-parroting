@@ -232,13 +232,14 @@ viewTab model tab =
 
 viewSelectVideoTab : Model -> Html Msg
 viewSelectVideoTab model =
-    div [ class "flex flex-col items-center" ]
+    div [ class "flex flex-col items-center gap-4" ]
         [ NewVideo.view
             { setNewVideoId = SetNewVideoId
             , setNewVideoTranscript = SetNewVideoTranscript
             , submitNewVideo = SubmitNewVideo
             }
-        , div [] (List.map (viewVideoCard model) model.videos)
+        , div [ class "flex flex-col gap-4" ]
+            (List.map (viewVideoCard model) model.videos)
         ]
 
 
