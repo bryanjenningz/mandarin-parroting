@@ -101,6 +101,10 @@ timeParserTests =
             \_ ->
                 Parser.run NewVideo.timeParser "0:05"
                     |> Expect.equal (Ok 5)
+        , test "Parses 0:59 as 59" <|
+            \_ ->
+                Parser.run NewVideo.timeParser "0:59"
+                    |> Expect.equal (Ok 59)
         , test "Parses 1:01 as 61" <|
             \_ ->
                 Parser.run NewVideo.timeParser "1:01"
