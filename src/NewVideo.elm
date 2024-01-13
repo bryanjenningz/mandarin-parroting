@@ -1,5 +1,6 @@
 module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
 
+import ExampleData
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
@@ -22,8 +23,8 @@ type NewVideo
 empty : NewVideo
 empty =
     NewVideo
-        { newVideoId = ""
-        , newVideoTranscript = ""
+        { newVideoId = ExampleData.videoId
+        , newVideoTranscript = ExampleData.transcript
         }
 
 

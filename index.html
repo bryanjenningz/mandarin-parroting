@@ -68,17 +68,18 @@
       }
 
       function submitNewVideo(data) {
+        const { videoId, subtitles } = data;
+        const RETRY_TIME = 1000;
         if (!player) {
           initVideo();
-          return setTimeout(() => submitNewVideo(data), INTERVAL_TIME);
+          return setTimeout(() => submitNewVideo(data), RETRY_TIME);
         }
-        const { videoId, subtitles } = data;
-        if (player.getVideoData().id !== videoId) {
-          player.loadVideoById(videoId);
-          return setTimeout(() => submitNewVideo(data), INTERVAL_TIME);
+        if (player.getVideoData?.()?.video_id !== videoId) {
+          player.loadVideoById?.(videoId);
+          return setTimeout(() => submitNewVideo(data), RETRY_TIME);
         }
-        app.ports.addVideo({
-          id: videoId,
+        app.ports.addVideo.send({
+          videoId,
           title: player.getVideoData().title,
           duration: player.getDuration(),
           subtitles,
