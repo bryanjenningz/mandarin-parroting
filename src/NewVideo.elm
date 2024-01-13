@@ -97,6 +97,7 @@ subtitleParser =
         |= timeParser
         |. Parser.spaces
         |= textParser
+        |. Parser.spaces
 
 
 timeParser : Parser Int

@@ -83,6 +83,10 @@ transcriptToSubtitlesTests =
             \_ ->
                 NewVideo.transcriptToSubtitles ""
                     |> Expect.equal (Ok [])
+        , test "Returns a single entry for a single line transcript" <|
+            \_ ->
+                NewVideo.transcriptToSubtitles "\n0:01\nHello\n"
+                    |> Expect.equal (Ok [ { time = 1, text = "Hello" } ])
         ]
 
 
