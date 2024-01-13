@@ -333,25 +333,28 @@ viewVideoSlider videoTime video =
 
 viewVideoControls : Model -> Html Msg
 viewVideoControls model =
-    div [ class "flex gap-2" ]
-        [ button
-            [ onClick FastRewind
-            , class "bg-blue-600 rounded-lg w-12 h-12"
+    div [ class "w-full flex gap-2 justify-between" ]
+        [ div [ class "basis-1 grow" ] []
+        , div [ class "flex gap-2" ]
+            [ button
+                [ onClick FastRewind
+                , class "bg-blue-600 rounded-lg w-12 h-12"
+                ]
+                [ labeledSymbol "Rewind" "<<" ]
+            , playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
+            , button
+                [ onClick FastForward
+                , class "bg-blue-600 rounded-lg w-12 h-12"
+                ]
+                [ labeledSymbol "Fast-forward" ">>" ]
             ]
-            [ labeledSymbol "Rewind" "<<" ]
-        , playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
-        , button
-            [ onClick FastForward
-            , class "bg-blue-600 rounded-lg w-12 h-12"
-            ]
-            [ labeledSymbol "Fast-forward" ">>" ]
         , viewVideoSpeed model.videoSpeed
         ]
 
 
 viewVideoSpeed : Int -> Html Msg
 viewVideoSpeed videoSpeed =
-    div [ class "flex items-center gap-1" ]
+    div [ class "flex items-center gap-1 basis-1 grow justify-end" ]
         [ button
             [ onClick (SetVideoSpeed (videoSpeed - 5))
             , class "bg-blue-600 rounded-lg w-6 h-12"
