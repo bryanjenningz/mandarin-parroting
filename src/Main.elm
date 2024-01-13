@@ -401,17 +401,17 @@ labeledSymbol label symbol =
 
 viewVideoCard : Model -> Video -> Html Msg
 viewVideoCard model video =
-    div [ class "px-5 py-5 mb-4 shadow shadow-slate-100 mx-auto w-full md:w-3/4 lg:w-1/2" ]
-        [ div []
-            [ h2 [ class "text-xl mb-3" ] [ text video.title ]
+    div [ class "px-5 py-5 border border-white rounded-lg mx-auto w-full" ]
+        [ div [ class "flex flex-col gap-4" ]
+            [ h2 [ class "text-xl" ] [ text video.title ]
             , div [ class "flex justify-between" ]
                 [ button
                     [ onClick (StartVideo video.videoId)
-                    , class "px-3 h-12 bg-cyan-500 hover:bg-cyan-600"
+                    , class "py-2 px-4 bg-blue-600 rounded-lg"
                     ]
                     [ text "Listen" ]
                 , if model.videoId == Just video.videoId then
-                    playButton model [ class "bg-cyan-500 hover:bg-cyan-600 w-12 h-12" ]
+                    playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
 
                   else
                     text ""
