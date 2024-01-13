@@ -349,7 +349,7 @@ viewSubtitles currentSubtitle subtitles =
             |> List.map
                 (\subtitle ->
                     div
-                        [ class "text-center text-xl"
+                        [ class "text-center text-2xl"
                         , classList
                             [ ( "text-blue-400", subtitle == currentSubtitle ) ]
                         , onClick (SetVideoTime subtitle.time)
