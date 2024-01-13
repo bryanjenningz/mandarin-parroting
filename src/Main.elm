@@ -330,13 +330,13 @@ viewVideoControls model =
     div [ class "flex gap-2" ]
         [ button
             [ onClick FastRewind
-            , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
+            , class "bg-blue-600 rounded-lg w-12 h-12"
             ]
             [ labeledSymbol "Rewind" "<<" ]
-        , playButton model [ class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600" ]
+        , playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
         , button
             [ onClick FastForward
-            , class "bg-cyan-500 w-12 h-12 hover:bg-cyan-600"
+            , class "bg-blue-600 rounded-lg w-12 h-12"
             ]
             [ labeledSymbol "Fast-forward" ">>" ]
         ]
