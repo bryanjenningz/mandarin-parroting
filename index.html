@@ -31,6 +31,7 @@
       app.ports.playVideo.subscribe(playVideo);
       app.ports.pauseVideo.subscribe(pauseVideo);
       app.ports.setVideoTime.subscribe(setVideoTime);
+      app.ports.setVideoSpeed.subscribe(setVideoSpeed);
       app.ports.submitNewVideo.subscribe(submitNewVideo);
 
       function startVideo(videoId) {
@@ -65,6 +66,10 @@
         if (!player) return initVideo();
         player.seekTo(videoTime);
         app.ports.getVideoTime.send(videoTime);
+      }
+
+      function setVideoSpeed(videoSpeed) {
+        player?.setPlaybackRate?.(videoSpeed / 100);
       }
 
       function submitNewVideo(data) {

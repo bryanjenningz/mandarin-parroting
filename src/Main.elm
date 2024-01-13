@@ -32,6 +32,7 @@ type alias Model =
     , videoId : Maybe VideoId
     , videoIsPlaying : Bool
     , videoTime : VideoTime
+    , videoSpeed : Int
     , videos : List Video
     , newVideo : NewVideo
     , newVideoError : Maybe NewVideo.Error
@@ -44,6 +45,7 @@ init () =
       , videoId = Nothing
       , videoIsPlaying = False
       , videoTime = 0
+      , videoSpeed = 100
       , videos = []
       , newVideo = NewVideo.empty
       , newVideoError = Nothing
@@ -67,6 +69,7 @@ type Msg
     | GetVideoTime VideoTime
     | SetVideoTime VideoTime
     | JumpToSubtitle Subtitle
+    | SetVideoSpeed Int
     | SetNewVideoId VideoId
     | SetNewVideoTranscript String
     | SubmitNewVideo
@@ -141,6 +144,9 @@ update msg model =
 
         JumpToSubtitle subtitle ->
             ( model, jumpToSubtitle subtitle )
+
+        SetVideoSpeed videoSpeed ->
+            ( { model | videoSpeed = clamp 50 200 videoSpeed }, setVideoSpeed videoSpeed )
 
         SetNewVideoId newVideoId ->
             ( { model | newVideo = NewVideo.setVideoId newVideoId model.newVideo }
@@ -339,6 +345,24 @@ viewVideoControls model =
             , class "bg-blue-600 rounded-lg w-12 h-12"
             ]
             [ labeledSymbol "Fast-forward" ">>" ]
+        , viewVideoSpeed model.videoSpeed
+        ]
+
+
+viewVideoSpeed : Int -> Html Msg
+viewVideoSpeed videoSpeed =
+    div [ class "flex items-center gap-1" ]
+        [ button
+            [ onClick (SetVideoSpeed (videoSpeed - 5))
+            , class "bg-blue-600 rounded-lg w-6 h-12"
+            ]
+            [ text "-" ]
+        , div [ class "text-xs" ] [ text (String.fromInt videoSpeed ++ "%") ]
+        , button
+            [ onClick (SetVideoSpeed (videoSpeed + 5))
+            , class "bg-blue-600 rounded-lg w-6 h-12"
+            ]
+            [ text "+" ]
         ]
 
 
@@ -456,6 +480,9 @@ port getVideoTime : (VideoTime -> msg) -> Sub msg
 
 
 port setVideoTime : VideoTime -> Cmd msg
+
+
+port setVideoSpeed : Int -> Cmd msg
 
 
 port submitNewVideo : { videoId : String, subtitles : List Subtitle } -> Cmd msg
