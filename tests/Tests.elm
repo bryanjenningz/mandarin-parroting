@@ -1,6 +1,7 @@
 module Tests exposing (..)
 
 import Expect
+import NewVideo
 import Test exposing (Test, describe, test)
 import Video
 
@@ -71,4 +72,14 @@ subtitleAtTests =
                     , { text = "b3", time = 789 }
                     ]
                     |> Expect.equal (Just { text = "b3", time = 789 })
+        ]
+
+
+transcriptToSubtitlesTests : Test
+transcriptToSubtitlesTests =
+    describe "NewVideo.transcriptToSubtitles"
+        [ test "Returns an empty list for an empty transcript" <|
+            \_ ->
+                NewVideo.transcriptToSubtitles ""
+                    |> Expect.equal (Ok [])
         ]

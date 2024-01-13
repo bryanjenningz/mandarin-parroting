@@ -1,4 +1,4 @@
-module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
+module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, transcriptToSubtitles, validate, view)
 
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
