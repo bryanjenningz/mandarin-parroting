@@ -276,7 +276,7 @@ viewPlayVideoTab model =
                 currentSubtitle =
                     Subtitles.at model.videoTime video.subtitles
             in
-            div [ class "flex flex-col items-center gap-2 h-full" ]
+            div [ class "flex flex-col items-center gap-2 h-[80vh]" ]
                 [ div [ class "text-xl text-center" ] [ text video.title ]
                 , viewVideoSlider model.videoTime video
                 , div []
@@ -291,7 +291,7 @@ viewPlayVideoTab model =
                         text ""
 
                     Just subtitle ->
-                        button [ onClick (JumpToSubtitle subtitle) ]
+                        button [ onClick (JumpToSubtitle subtitle), class "text-xl" ]
                             [ text subtitle.text ]
                 , viewVideoControls model
                 , case currentSubtitle of
@@ -319,7 +319,7 @@ viewVideoSlider videoTime video =
                         |> Maybe.map SetVideoTime
                         |> Maybe.withDefault (SetVideoTime 0)
                 )
-            , class "block w-full md:w-3/4 lg:w-1/2 mx-auto"
+            , class "block w-full mx-auto"
             ]
             []
         ]
@@ -344,14 +344,14 @@ viewVideoControls model =
 
 viewSubtitles : Subtitle -> Subtitles -> Html Msg
 viewSubtitles currentSubtitle subtitles =
-    div [ Attr.id subtitlesContainerId, class "overflow-y-scroll h-1/2 md:h-3/5" ]
+    div [ Attr.id subtitlesContainerId, class "overflow-y-scroll" ]
         (subtitles
             |> List.map
                 (\subtitle ->
                     div
-                        [ class "text-center"
+                        [ class "text-center text-xl"
                         , classList
-                            [ ( "text-cyan-300", subtitle == currentSubtitle ) ]
+                            [ ( "text-blue-400", subtitle == currentSubtitle ) ]
                         , onClick (SetVideoTime subtitle.time)
                         , Attr.id (subtitleId subtitle)
                         ]
