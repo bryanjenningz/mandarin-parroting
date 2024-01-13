@@ -3,6 +3,7 @@ module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVide
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
+import Parser exposing ((|.), (|=), Parser)
 import Video exposing (Subtitle, VideoId)
 
 
@@ -72,6 +73,32 @@ validate (NewVideo newVideo) =
 transcriptToSubtitles : String -> Maybe (List Subtitle)
 transcriptToSubtitles _ =
     Nothing
+
+
+subtitleParser : Parser Subtitle
+subtitleParser =
+    Parser.succeed (\time text -> { time = toFloat time, text = text })
+        |. Parser.spaces
+        |= timeParser
+        |. Parser.spaces
+        |= textParser
+
+
+timeParser : Parser Int
+timeParser =
+    Parser.succeed (\minutes seconds -> minutes * 60 + seconds)
+        |. Parser.spaces
+        |= Parser.int
+        |. Parser.symbol ":"
+        |= Parser.int
+
+
+textParser : Parser String
+textParser =
+    Parser.getChompedString <|
+        Parser.succeed ()
+            |. Parser.spaces
+            |. Parser.chompUntilEndOr "\n"
 
 
 encode : ValidNewVideo -> { videoId : String, subtitles : List Subtitle }
