@@ -2,6 +2,7 @@ module Tests exposing (..)
 
 import Expect
 import NewVideo
+import Parser
 import Test exposing (Test, describe, test)
 import Video
 
@@ -82,4 +83,14 @@ transcriptToSubtitlesTests =
             \_ ->
                 NewVideo.transcriptToSubtitles ""
                     |> Expect.equal (Ok [])
+        ]
+
+
+timeParserTests : Test
+timeParserTests =
+    describe "NewVideo.timeParser"
+        [ test "Parses 1:23 as 83" <|
+            \_ ->
+                Parser.run NewVideo.timeParser "1:23"
+                    |> Expect.equal (Ok 83)
         ]
