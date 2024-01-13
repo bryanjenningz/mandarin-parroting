@@ -4,8 +4,8 @@ import Html exposing (Html, article, button, div, h2, input, label, text, textar
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
 import Parser exposing (DeadEnd)
-import Subtitles
-import Video exposing (Subtitle, VideoId)
+import Subtitles exposing (Subtitle)
+import Video exposing (VideoId)
 
 
 

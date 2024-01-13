@@ -1,7 +1,22 @@
-module Subtitles exposing (fromTranscript, subtitlesParser, textParser, timeParser)
+module Subtitles exposing (Subtitle, Subtitles, at, fromTranscript, next, prev, subtitlesParser, textParser, timeParser)
 
+import List.Extra as List
 import Parser exposing ((|.), (|=), DeadEnd, Parser, Step(..))
-import Video exposing (Subtitle)
+import VideoTime exposing (VideoTime)
+
+
+type alias Subtitles =
+    List Subtitle
+
+
+type alias Subtitle =
+    { time : Float
+    , text : String
+    }
+
+
+
+-- PARSE FROM TRANSCRIPT
 
 
 fromTranscript : String -> Result (List DeadEnd) (List Subtitle)
@@ -58,3 +73,36 @@ timeParser =
         |. Parser.symbol ":"
         |. Parser.oneOf [ Parser.symbol "0", Parser.succeed () ]
         |= Parser.int
+
+
+
+-- FIND SUBTITLES
+
+
+at : VideoTime -> Subtitles -> Maybe Subtitle
+at videoTime subtitles =
+    case List.filter (\sub -> videoTime >= sub.time) subtitles |> List.last of
+        Nothing ->
+            List.head subtitles
+
+        subtitle ->
+            subtitle
+
+
+next : VideoTime -> List Subtitle -> Maybe Subtitle
+next videoTime subtitles =
+    List.find (\sub -> videoTime < sub.time) subtitles
+
+
+prev : VideoTime -> List Subtitle -> Maybe Subtitle
+prev videoTime subtitles =
+    let
+        timeTolerance =
+            0.8
+    in
+    case List.filter (\sub -> videoTime >= sub.time + timeTolerance) subtitles |> List.last of
+        Nothing ->
+            List.head subtitles
+
+        subtitle ->
+            subtitle
