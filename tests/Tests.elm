@@ -1,8 +1,8 @@
 module Tests exposing (..)
 
 import Expect
-import NewVideo
 import Parser
+import Subtitles
 import Test exposing (Test, describe, test)
 import Video
 
@@ -76,20 +76,20 @@ subtitleAtTests =
         ]
 
 
-transcriptToSubtitlesTests : Test
-transcriptToSubtitlesTests =
-    describe "NewVideo.transcriptToSubtitles"
+subtitlesFromTranscriptTests : Test
+subtitlesFromTranscriptTests =
+    describe "Subtitles.fromTranscript"
         [ test "Returns an empty list for an empty transcript" <|
             \_ ->
-                NewVideo.fromTranscript ""
+                Subtitles.fromTranscript ""
                     |> Expect.equal (Ok [])
         , test "Returns a single entry for a single line transcript" <|
             \_ ->
-                NewVideo.fromTranscript "\n0:01\nHello\n"
+                Subtitles.fromTranscript "\n0:01\nHello\n"
                     |> Expect.equal (Ok [ { text = "Hello", time = 1 } ])
         , test "Returns 2 entries for a 2-line transcript" <|
             \_ ->
-                NewVideo.fromTranscript "\n0:01\nHello\n1:01\nHi"
+                Subtitles.fromTranscript "\n0:01\nHello\n1:01\nHi"
                     |> Expect.equal
                         (Ok
                             [ { text = "Hello", time = 1 }
@@ -98,7 +98,7 @@ transcriptToSubtitlesTests =
                         )
         , test "Returns 3 entries for a 3-line transcript" <|
             \_ ->
-                NewVideo.fromTranscript
+                Subtitles.fromTranscript
                     """0:00
 各位同学大家好 我是李永乐老师
 0:02
@@ -115,35 +115,35 @@ transcriptToSubtitlesTests =
         ]
 
 
-timeParserTests : Test
-timeParserTests =
-    describe "NewVideo.timeParser"
+subtitlesTimeParserTests : Test
+subtitlesTimeParserTests =
+    describe "Subtitles.timeParser"
         [ test "Parses 0:12 as 12" <|
             \_ ->
-                Parser.run NewVideo.timeParser "0:12"
+                Parser.run Subtitles.timeParser "0:12"
                     |> Expect.equal (Ok 12)
         , test "Parses 1:23 as 83" <|
             \_ ->
-                Parser.run NewVideo.timeParser "1:23"
+                Parser.run Subtitles.timeParser "1:23"
                     |> Expect.equal (Ok 83)
         , test "Parses 0:05 as 5" <|
             \_ ->
-                Parser.run NewVideo.timeParser "0:05"
+                Parser.run Subtitles.timeParser "0:05"
                     |> Expect.equal (Ok 5)
         , test "Parses 0:59 as 59" <|
             \_ ->
-                Parser.run NewVideo.timeParser "0:59"
+                Parser.run Subtitles.timeParser "0:59"
                     |> Expect.equal (Ok 59)
         , test "Parses 10:59 as 659" <|
             \_ ->
-                Parser.run NewVideo.timeParser "10:59"
+                Parser.run Subtitles.timeParser "10:59"
                     |> Expect.equal (Ok 659)
         , test "Parses 10:00 as 600" <|
             \_ ->
-                Parser.run NewVideo.timeParser "10:00"
+                Parser.run Subtitles.timeParser "10:00"
                     |> Expect.equal (Ok 600)
         , test "Parses 1:01 as 61" <|
             \_ ->
-                Parser.run NewVideo.timeParser "1:01"
+                Parser.run Subtitles.timeParser "1:01"
                     |> Expect.equal (Ok 61)
         ]

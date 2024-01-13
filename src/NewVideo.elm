@@ -1,9 +1,10 @@
-module NewVideo exposing (Error, NewVideo, empty, encode, fromTranscript, setTranscript, setVideoId, timeParser, validate, view)
+module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
 
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
-import Parser exposing ((|.), (|=), DeadEnd, Parser, Step(..))
+import Parser exposing (DeadEnd)
+import Subtitles
 import Video exposing (Subtitle, VideoId)
 
 
@@ -62,68 +63,12 @@ validate (NewVideo newVideo) =
         Err EmptyTranscript
 
     else
-        case fromTranscript newVideo.newVideoTranscript of
+        case Subtitles.fromTranscript newVideo.newVideoTranscript of
             Err deadEnds ->
                 Err (InvalidTranscript deadEnds)
 
             Ok subtitles ->
                 Ok (ValidNewVideo { videoId = newVideo.newVideoId, subtitles = subtitles })
-
-
-fromTranscript : String -> Result (List DeadEnd) (List Subtitle)
-fromTranscript transcript =
-    Parser.run subtitlesParser transcript
-
-
-subtitlesParser : Parser (List Subtitle)
-subtitlesParser =
-    Parser.loop [] subtitlesParserHelper
-
-
-subtitlesParserHelper : List Subtitle -> Parser (Step (List Subtitle) (List Subtitle))
-subtitlesParserHelper revSubtitles =
-    Parser.oneOf
-        [ Parser.succeed (\subtitle -> Loop (subtitle :: revSubtitles))
-            |= subtitleParser
-        , Parser.succeed ()
-            |> Parser.map (\_ -> Done (List.reverse revSubtitles))
-        ]
-
-
-subtitleParser : Parser Subtitle
-subtitleParser =
-    Parser.succeed (\time text -> { time = toFloat time, text = text })
-        |. Parser.spaces
-        |= timeParser
-        |. Parser.spaces
-        |= textParser
-        |. Parser.spaces
-
-
-timeParser : Parser Int
-timeParser =
-    Parser.succeed (\minutes seconds -> minutes * 60 + seconds)
-        |. Parser.spaces
-        |= Parser.oneOf
-            [ Parser.succeed identity
-                |. Parser.symbol "0"
-                |= Parser.oneOf
-                    [ Parser.int
-                    , Parser.succeed 0
-                    ]
-            , Parser.int
-            ]
-        |. Parser.symbol ":"
-        |. Parser.oneOf [ Parser.symbol "0", Parser.succeed () ]
-        |= Parser.int
-
-
-textParser : Parser String
-textParser =
-    Parser.getChompedString <|
-        Parser.succeed ()
-            |. Parser.spaces
-            |. Parser.chompUntilEndOr "\n"
 
 
 encode : ValidNewVideo -> { videoId : String, subtitles : List Subtitle }
