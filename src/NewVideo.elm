@@ -1,4 +1,4 @@
-module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, timeParser, transcriptToSubtitles, validate, view)
+module NewVideo exposing (Error, NewVideo, empty, encode, fromTranscript, setTranscript, setVideoId, timeParser, validate, view)
 
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
@@ -62,7 +62,7 @@ validate (NewVideo newVideo) =
         Err EmptyTranscript
 
     else
-        case transcriptToSubtitles newVideo.newVideoTranscript of
+        case fromTranscript newVideo.newVideoTranscript of
             Err deadEnds ->
                 Err (InvalidTranscript deadEnds)
 
@@ -70,8 +70,8 @@ validate (NewVideo newVideo) =
                 Ok (ValidNewVideo { videoId = newVideo.newVideoId, subtitles = subtitles })
 
 
-transcriptToSubtitles : String -> Result (List DeadEnd) (List Subtitle)
-transcriptToSubtitles transcript =
+fromTranscript : String -> Result (List DeadEnd) (List Subtitle)
+fromTranscript transcript =
     Parser.run subtitlesParser transcript
 
 
