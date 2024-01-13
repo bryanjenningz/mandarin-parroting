@@ -86,7 +86,16 @@ transcriptToSubtitlesTests =
         , test "Returns a single entry for a single line transcript" <|
             \_ ->
                 NewVideo.transcriptToSubtitles "\n0:01\nHello\n"
-                    |> Expect.equal (Ok [ { time = 1, text = "Hello" } ])
+                    |> Expect.equal (Ok [ { text = "Hello", time = 1 } ])
+        , test "Returns 2 entries for a 2-line transcript" <|
+            \_ ->
+                NewVideo.transcriptToSubtitles "\n0:01\nHello\n1:01\nHi"
+                    |> Expect.equal
+                        (Ok
+                            [ { text = "Hello", time = 1 }
+                            , { text = "Hi", time = 61 }
+                            ]
+                        )
         ]
 
 
