@@ -176,15 +176,17 @@ getVideo videoId videos =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ class "flex flex-col items-center" ]
         [ div [ class "fixed w-full" ] [ viewTabs model ]
-        , div [ class "pt-24 px-3" ]
-            [ case model.tab of
-                SelectVideoTab ->
-                    viewSelectVideoTab model
+        , div [ class "w-full max-w-2xl" ]
+            [ div [ class "pt-24 px-3" ]
+                [ case model.tab of
+                    SelectVideoTab ->
+                        viewSelectVideoTab model
 
-                PlayVideoTab ->
-                    viewPlayVideoTab model
+                    PlayVideoTab ->
+                        viewPlayVideoTab model
+                ]
             ]
         ]
 
