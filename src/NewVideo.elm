@@ -103,8 +103,17 @@ timeParser : Parser Int
 timeParser =
     Parser.succeed (\minutes seconds -> minutes * 60 + seconds)
         |. Parser.spaces
-        |= Parser.int
+        |= Parser.oneOf
+            [ Parser.succeed identity
+                |. Parser.symbol "0"
+                |= Parser.oneOf
+                    [ Parser.int
+                    , Parser.succeed 0
+                    ]
+            , Parser.int
+            ]
         |. Parser.symbol ":"
+        |. Parser.oneOf [ Parser.symbol "0", Parser.succeed () ]
         |= Parser.int
 
 
