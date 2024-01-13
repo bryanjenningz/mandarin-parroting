@@ -409,7 +409,7 @@ viewVideoCard model video =
                     [ onClick (StartVideo video.videoId)
                     , class "py-2 px-4 bg-blue-600 rounded-lg"
                     ]
-                    [ text "Listen" ]
+                    [ text "Practice" ]
                 , if model.videoId == Just video.videoId then
                     playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
 
