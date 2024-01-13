@@ -59,7 +59,12 @@
 
       function getVideoTime() {
         if (!player) return initVideo();
-        app.ports.getVideoTime.send(player.getCurrentTime() || 0);
+        const time = player.getCurrentTime() || 0;
+        if (isPlaying && time >= player.getDuration()) {
+          player.seekTo(0);
+          return app.ports.getVideoTime.send(0);
+        }
+        app.ports.getVideoTime.send(time);
       }
 
       function setVideoTime(videoTime) {
