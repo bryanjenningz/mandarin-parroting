@@ -3,7 +3,7 @@ module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVide
 import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
-import Parser exposing ((|.), (|=), Parser)
+import Parser exposing ((|.), (|=), DeadEnd, Parser, Step(..))
 import Video exposing (Subtitle, VideoId)
 
 
@@ -43,7 +43,7 @@ setTranscript transcript (NewVideo newVideo) =
 type Error
     = EmptyVideoId
     | EmptyTranscript
-    | InvalidTranscript
+    | InvalidTranscript (List DeadEnd)
 
 
 type ValidNewVideo
@@ -63,16 +63,31 @@ validate (NewVideo newVideo) =
 
     else
         case transcriptToSubtitles newVideo.newVideoTranscript of
-            Nothing ->
-                Err InvalidTranscript
+            Err deadEnds ->
+                Err (InvalidTranscript deadEnds)
 
-            Just subtitles ->
+            Ok subtitles ->
                 Ok (ValidNewVideo { videoId = newVideo.newVideoId, subtitles = subtitles })
 
 
-transcriptToSubtitles : String -> Maybe (List Subtitle)
-transcriptToSubtitles _ =
-    Nothing
+transcriptToSubtitles : String -> Result (List DeadEnd) (List Subtitle)
+transcriptToSubtitles transcript =
+    Parser.run subtitlesParser transcript
+
+
+subtitlesParser : Parser (List Subtitle)
+subtitlesParser =
+    Parser.loop [] subtitlesParserHelper
+
+
+subtitlesParserHelper : List Subtitle -> Parser (Step (List Subtitle) (List Subtitle))
+subtitlesParserHelper revSubtitles =
+    Parser.oneOf
+        [ Parser.succeed (\subtitle -> Loop (subtitle :: revSubtitles))
+            |= subtitleParser
+        , Parser.succeed ()
+            |> Parser.map (\_ -> Done (List.reverse revSubtitles))
+        ]
 
 
 subtitleParser : Parser Subtitle
