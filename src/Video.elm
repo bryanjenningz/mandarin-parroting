@@ -1,8 +1,8 @@
-module Video exposing (Video, VideoId, viewCard, viewControls, viewSpeed)
+module Video exposing (Video, VideoId, viewCard, viewControls, viewSlider)
 
-import Html exposing (Attribute, Html, button, div, h2, span, text)
-import Html.Attributes exposing (attribute, class)
-import Html.Events exposing (onClick)
+import Html exposing (Attribute, Html, button, div, h2, input, span, text)
+import Html.Attributes as Attr exposing (attribute, class)
+import Html.Events exposing (onClick, onInput)
 import Subtitles exposing (Subtitles)
 import VideoTime exposing (VideoTime)
 
@@ -19,27 +19,8 @@ type alias Video =
     }
 
 
-type alias ViewSpeedProps msg =
-    { videoSpeed : Int
-    , setVideoSpeed : Int -> msg
-    }
 
-
-viewSpeed : ViewSpeedProps msg -> Html msg
-viewSpeed props =
-    div [ class "flex justify-end items-center gap-1" ]
-        [ button
-            [ onClick (props.setVideoSpeed (props.videoSpeed - 5))
-            , class "bg-blue-600 rounded-lg w-6 h-12"
-            ]
-            [ text "-" ]
-        , div [ class "text-xs" ] [ text (String.fromInt props.videoSpeed ++ "%") ]
-        , button
-            [ onClick (props.setVideoSpeed (props.videoSpeed + 5))
-            , class "bg-blue-600 rounded-lg w-6 h-12"
-            ]
-            [ text "+" ]
-        ]
+-- VIEW
 
 
 type alias VideoControlsProps msg =
@@ -116,6 +97,61 @@ viewCard props video =
                     text ""
                 ]
             ]
+        ]
+
+
+type alias ViewSliderProps msg =
+    { videoTime : VideoTime
+    , setVideoTime : VideoTime -> msg
+    }
+
+
+viewSlider : ViewSliderProps msg -> Video -> Html msg
+viewSlider props video =
+    div [ class "w-full" ]
+        [ input
+            [ Attr.type_ "range"
+            , Attr.min "0"
+            , Attr.max (String.fromFloat video.duration)
+            , Attr.step "1"
+            , Attr.value (String.fromFloat props.videoTime)
+            , onInput
+                (\inputText ->
+                    inputText
+                        |> String.toFloat
+                        |> Maybe.map props.setVideoTime
+                        |> Maybe.withDefault (props.setVideoTime 0)
+                )
+            , class "block w-full mx-auto"
+            ]
+            []
+        ]
+
+
+
+-- INTERNAL
+
+
+type alias ViewSpeedProps msg =
+    { videoSpeed : Int
+    , setVideoSpeed : Int -> msg
+    }
+
+
+viewSpeed : ViewSpeedProps msg -> Html msg
+viewSpeed props =
+    div [ class "flex justify-end items-center gap-1" ]
+        [ button
+            [ onClick (props.setVideoSpeed (props.videoSpeed - 5))
+            , class "bg-blue-600 rounded-lg w-6 h-12"
+            ]
+            [ text "-" ]
+        , div [ class "text-xs" ] [ text (String.fromInt props.videoSpeed ++ "%") ]
+        , button
+            [ onClick (props.setVideoSpeed (props.videoSpeed + 5))
+            , class "bg-blue-600 rounded-lg w-6 h-12"
+            ]
+            [ text "+" ]
         ]
 
 

@@ -2,14 +2,14 @@ port module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing (Html, button, div, h2, input, text)
+import Html exposing (Html, button, div, h2, text)
 import Html.Attributes as Attr exposing (class, classList)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick)
 import List.Extra as List
 import NewVideo exposing (NewVideo)
 import Subtitles exposing (Subtitle, Subtitles)
 import Task
-import Video exposing (Video, VideoId, viewCard, viewControls)
+import Video exposing (Video, VideoId)
 import VideoTime exposing (VideoTime)
 
 
@@ -247,7 +247,7 @@ viewSelectVideoTab model =
             }
         , div [ class "flex flex-col gap-4" ]
             (List.map
-                (viewCard
+                (Video.viewCard
                     { pauseVideo = PauseVideo
                     , playVideo = PlayVideo
                     , startVideo = StartVideo
@@ -295,7 +295,11 @@ viewPlayVideoTab model =
             in
             div [ class "flex flex-col items-center gap-2 h-[80vh]" ]
                 [ div [ class "text-xl text-center" ] [ text video.title ]
-                , viewVideoSlider model.videoTime video
+                , Video.viewSlider
+                    { videoTime = model.videoTime
+                    , setVideoTime = SetVideoTime
+                    }
+                    video
                 , div []
                     [ text
                         (VideoTime.toString model.videoTime
@@ -310,7 +314,7 @@ viewPlayVideoTab model =
                     Just subtitle ->
                         button [ onClick (JumpToSubtitle subtitle), class "text-xl" ]
                             [ text subtitle.text ]
-                , viewControls
+                , Video.viewControls
                     { videoIsPlaying = model.videoIsPlaying
                     , videoSpeed = model.videoSpeed
                     , fastForward = FastForward
@@ -326,28 +330,6 @@ viewPlayVideoTab model =
                     Just subtitle ->
                         viewSubtitles subtitle video.subtitles
                 ]
-
-
-viewVideoSlider : VideoTime -> Video -> Html Msg
-viewVideoSlider videoTime video =
-    div [ class "w-full" ]
-        [ input
-            [ Attr.type_ "range"
-            , Attr.min "0"
-            , Attr.max (String.fromFloat video.duration)
-            , Attr.step "1"
-            , Attr.value (String.fromFloat videoTime)
-            , onInput
-                (\inputText ->
-                    inputText
-                        |> String.toFloat
-                        |> Maybe.map SetVideoTime
-                        |> Maybe.withDefault (SetVideoTime 0)
-                )
-            , class "block w-full mx-auto"
-            ]
-            []
-        ]
 
 
 viewSubtitles : Subtitle -> Subtitles -> Html Msg
