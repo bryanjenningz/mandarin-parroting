@@ -1,5 +1,6 @@
-module Dictionary exposing (Model, Msg, init, update)
+module Dictionary exposing (Model, Msg, init, search, update)
 
+import Array exposing (Array)
 import Http
 
 
@@ -9,7 +10,7 @@ import Http
 
 type Model
     = EmptyDictionary
-    | Dictionary { simplified : List String, traditional : List String }
+    | Dictionary { simplified : Array String, traditional : Array String }
     | FailedToLoadDictionary Http.Error
 
 
@@ -46,18 +47,11 @@ update msg _ =
                     dictionary |> String.split "\n"
 
                 traditional =
-                    simplified
-                        |> List.sortBy
-                            (\line ->
-                                line
-                                    |> parseLine
-                                    |> Maybe.map .traditional
-                                    |> Maybe.withDefault ""
-                            )
+                    simplified |> List.sortBy toTraditional
             in
             ( Dictionary
-                { simplified = simplified
-                , traditional = traditional
+                { simplified = Array.fromList simplified
+                , traditional = Array.fromList traditional
                 }
             , Cmd.none
             )
@@ -88,3 +82,42 @@ parseLine line =
 
         _ ->
             Nothing
+
+
+search : String -> Model -> Maybe Line
+search searchText model =
+    case model of
+        EmptyDictionary ->
+            Nothing
+
+        FailedToLoadDictionary _ ->
+            Nothing
+
+        Dictionary dictionaryData ->
+            case search_ searchText toSimplified dictionaryData.simplified of
+                Nothing ->
+                    search_ searchText toTraditional dictionaryData.traditional
+
+                Just line ->
+                    Just line
+
+
+search_ : String -> (String -> String) -> Array String -> Maybe Line
+search_ searchText toSortKey dictionaryData =
+    Nothing
+
+
+toSimplified : String -> String
+toSimplified line =
+    line
+        |> parseLine
+        |> Maybe.map .simplified
+        |> Maybe.withDefault ""
+
+
+toTraditional : String -> String
+toTraditional line =
+    line
+        |> parseLine
+        |> Maybe.map .traditional
+        |> Maybe.withDefault ""
