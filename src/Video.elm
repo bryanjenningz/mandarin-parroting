@@ -151,13 +151,13 @@ viewSpeed props =
             [ onClick (props.setVideoSpeed (props.videoSpeed - 5))
             , class "bg-blue-600 rounded-lg w-6 h-6"
             ]
-            [ text "-" ]
+            [ labeledSymbol "Decrease video speed" "-" ]
         , div [ class "text-xs" ] [ text (String.fromInt props.videoSpeed ++ "%") ]
         , button
             [ onClick (props.setVideoSpeed (props.videoSpeed + 5))
             , class "bg-blue-600 rounded-lg w-6 h-6"
             ]
-            [ text "+" ]
+            [ labeledSymbol "Increase video speed" "+" ]
         ]
 
 
