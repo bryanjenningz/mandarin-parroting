@@ -1,4 +1,4 @@
-module Dictionary exposing (Model, Msg, fetch, init, search, update, view)
+module Dictionary exposing (Model, Msg, fetch, init, update, view)
 
 import Array exposing (Array)
 import Html exposing (Html, article, div, h2, p, text)
@@ -66,20 +66,6 @@ update msg _ =
 
 
 
--- SEARCH
-
-
-search : String -> DictionaryData -> Maybe Line
-search searchText dictionaryData =
-    case binarySearchSimplified searchText dictionaryData of
-        Nothing ->
-            binarySearchTraditional searchText dictionaryData
-
-        Just line ->
-            Just line
-
-
-
 -- VIEW
 
 
@@ -103,17 +89,18 @@ view searchText model =
         ]
 
 
-viewLine : Line -> Html msg
-viewLine line =
-    article [ class "flex flex-col p-4 gap-4 border border-white rounded-lg bg-black text-white" ]
-        [ h2 [] [ text (line.traditional ++ " " ++ line.simplified) ]
-        , div [] [ text line.pinyin ]
-        , p [] [ text (String.join "; " line.definitions) ]
-        ]
-
-
 
 -- INTERNAL
+
+
+search : String -> DictionaryData -> Maybe Line
+search searchText dictionaryData =
+    case binarySearchSimplified searchText dictionaryData of
+        Nothing ->
+            binarySearchTraditional searchText dictionaryData
+
+        Just line ->
+            Just line
 
 
 binarySearchSimplified : String -> DictionaryData -> Maybe Line
@@ -218,3 +205,12 @@ parseLine line =
 
         _ ->
             Nothing
+
+
+viewLine : Line -> Html msg
+viewLine line =
+    article [ class "flex flex-col p-4 gap-4 border border-white rounded-lg bg-black text-white" ]
+        [ h2 [] [ text (line.traditional ++ " " ++ line.simplified) ]
+        , div [] [ text line.pinyin ]
+        , p [] [ text (String.join "; " line.definitions) ]
+        ]
