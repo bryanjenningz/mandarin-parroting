@@ -1,8 +1,9 @@
-module Video exposing (Video, VideoId, getById, viewCard, viewControls, viewSlider)
+module Video exposing (Video, VideoId, decoder, getById, viewCard, viewControls, viewSlider)
 
 import Html exposing (Attribute, Html, button, div, h2, input, span, text)
 import Html.Attributes as Attr exposing (attribute, class)
 import Html.Events exposing (onClick, onInput)
+import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Subtitles exposing (Subtitles)
 import VideoTime exposing (VideoTime)
@@ -18,6 +19,22 @@ type alias Video =
     , duration : VideoTime
     , subtitles : Subtitles
     }
+
+
+decoder : Decoder Video
+decoder =
+    Decode.map4
+        (\videoId title duration subtitles ->
+            { videoId = videoId
+            , title = title
+            , duration = duration
+            , subtitles = subtitles
+            }
+        )
+        (Decode.field "videoId" Decode.string)
+        (Decode.field "title" Decode.string)
+        (Decode.field "duration" Decode.float)
+        (Decode.field "subtitles" (Decode.list Subtitles.decoder))
 
 
 getById : Maybe VideoId -> List Video -> Maybe Video

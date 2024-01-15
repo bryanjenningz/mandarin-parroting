@@ -1,5 +1,6 @@
-module Subtitles exposing (Subtitle, Subtitles, at, fromTranscript, next, prev, subtitlesParser, textParser, timeParser)
+module Subtitles exposing (Subtitle, Subtitles, at, decoder, fromTranscript, next, prev, subtitlesParser, textParser, timeParser)
 
+import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Parser exposing ((|.), (|=), DeadEnd, Parser, Step(..))
 import VideoTime exposing (VideoTime)
@@ -13,6 +14,13 @@ type alias Subtitle =
     { time : Float
     , text : String
     }
+
+
+decoder : Decoder Subtitle
+decoder =
+    Decode.map2 (\time text -> { time = time, text = text })
+        (Decode.field "time" Decode.float)
+        (Decode.field "text" Decode.string)
 
 
 

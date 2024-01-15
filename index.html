@@ -25,7 +25,7 @@
 
       const app = Elm.Main.init({
         node: document.getElementById("root"),
-        flags: localStorage.getItem("model"),
+        flags: localStorage.getItem("flags"),
       });
       app.ports.startVideo.subscribe(startVideo);
       app.ports.playVideo.subscribe(playVideo);
@@ -33,6 +33,7 @@
       app.ports.setVideoTime.subscribe(setVideoTime);
       app.ports.setVideoSpeed.subscribe(setVideoSpeed);
       app.ports.submitNewVideo.subscribe(submitNewVideo);
+      app.ports.saveFlags.subscribe(saveFlags);
 
       function startVideo(videoId) {
         if (!player || !player.loadVideoById) return initVideo(videoId);
@@ -94,6 +95,10 @@
           duration: player.getDuration(),
           subtitles,
         });
+      }
+
+      function saveFlags(flags) {
+        localStorage.setItem("flags", JSON.stringify(flags));
       }
 
       function initVideo(videoId = DEFAULT_VIDEO_ID) {

@@ -5,6 +5,7 @@ import Browser.Dom as Dom
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
+import Json.Decode as Decode exposing (Decoder, Value)
 import NewVideo exposing (NewVideo)
 import Subtitles exposing (Subtitle, Subtitles)
 import Task
@@ -12,7 +13,7 @@ import Video exposing (Video, VideoId)
 import VideoTime exposing (VideoTime)
 
 
-main : Program () Model Msg
+main : Program Value Model Msg
 main =
     Browser.element
         { init = init
@@ -38,14 +39,47 @@ type alias Model =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
+type alias Flags =
+    { videoId : Maybe VideoId
+    , videoSpeed : Int
+    , videos : List Video
+    }
+
+
+flagsDecoder : Decoder Flags
+flagsDecoder =
+    Decode.map3
+        (\videoId videoSpeed videos ->
+            { videoId = videoId, videoSpeed = videoSpeed, videos = videos }
+        )
+        (Decode.field "videoId" (Decode.maybe Decode.string))
+        (Decode.field "videoSpeed" Decode.int)
+        (Decode.field "videos" (Decode.list Video.decoder))
+
+
+flagsDefault : Flags
+flagsDefault =
+    { videoId = Nothing
+    , videoSpeed = 100
+    , videos = []
+    }
+
+
+init : Value -> ( Model, Cmd Msg )
+init value =
+    let
+        flags =
+            value
+                |> Decode.decodeValue Decode.string
+                |> Result.andThen (Decode.decodeString flagsDecoder)
+                |> Result.withDefault flagsDefault
+    in
     ( { tab = SelectVideoTab
-      , videoId = Nothing
+      , videoId = flags.videoId
       , videoIsPlaying = False
       , videoTime = 0
-      , videoSpeed = 100
-      , videos = []
+      , videoSpeed = flags.videoSpeed
+      , videos = flags.videos
       , newVideo = NewVideo.empty
       , newVideoError = Nothing
       }
@@ -85,16 +119,27 @@ update msg model =
             ( { model | tab = tab }, Cmd.none )
 
         StartVideo videoId ->
-            ( { model
-                | tab = PlayVideoTab
-                , videoId = Just videoId
-                , videoIsPlaying = True
-              }
-            , if Just videoId == model.videoId then
-                playVideo ()
+            let
+                newModel =
+                    { model
+                        | tab = PlayVideoTab
+                        , videoId = Just videoId
+                        , videoIsPlaying = True
+                    }
+            in
+            ( newModel
+            , Cmd.batch
+                [ if Just videoId == model.videoId then
+                    playVideo ()
 
-              else
-                startVideo videoId
+                  else
+                    startVideo videoId
+                , saveFlags
+                    { videoId = newModel.videoId
+                    , videoSpeed = newModel.videoSpeed
+                    , videos = newModel.videos
+                    }
+                ]
             )
 
         PlayVideo ->
@@ -145,7 +190,20 @@ update msg model =
             ( model, jumpToSubtitle subtitle )
 
         SetVideoSpeed videoSpeed ->
-            ( { model | videoSpeed = clamp 50 200 videoSpeed }, setVideoSpeed videoSpeed )
+            let
+                newModel =
+                    { model | videoSpeed = clamp 50 200 videoSpeed }
+            in
+            ( newModel
+            , Cmd.batch
+                [ setVideoSpeed videoSpeed
+                , saveFlags
+                    { videoId = newModel.videoId
+                    , videoSpeed = newModel.videoSpeed
+                    , videos = newModel.videos
+                    }
+                ]
+            )
 
         SetNewVideoId newVideoId ->
             ( { model | newVideo = NewVideo.setVideoId newVideoId model.newVideo }
@@ -168,7 +226,17 @@ update msg model =
                     ( { model | newVideoError = Just error }, Cmd.none )
 
         AddVideo video ->
-            ( { model | videos = model.videos ++ [ video ] }, Cmd.none )
+            let
+                newModel =
+                    { model | videos = model.videos ++ [ video ] }
+            in
+            ( newModel
+            , saveFlags
+                { videoId = newModel.videoId
+                , videoSpeed = newModel.videoSpeed
+                , videos = newModel.videos
+                }
+            )
 
 
 
@@ -409,3 +477,6 @@ port submitNewVideo : { videoId : String, subtitles : List Subtitle } -> Cmd msg
 
 
 port addVideo : (Video -> msg) -> Sub msg
+
+
+port saveFlags : Flags -> Cmd msg
