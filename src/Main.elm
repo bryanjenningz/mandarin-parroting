@@ -368,13 +368,13 @@ viewPlayVideoTab model =
         Nothing ->
             div [ class "flex flex-col items-center" ]
                 [ div [ class "w-full max-w-2xl flex flex-col items-center gap-4" ]
-                    [ h2 [ class "text-2xl" ]
+                    [ h2 [ class "text-2xl text-center" ]
                         [ text <|
                             if List.isEmpty model.videos then
                                 "You haven't added any videos yet."
 
                             else
-                                "You haven't selected a video."
+                                "You haven't selected a video to practice."
                         ]
                     , button
                         [ onClick (TabClicked SelectVideoTab)
