@@ -18,8 +18,8 @@ type Model
 
 
 type alias DictionaryData =
-    { simplified : Array String
-    , traditional : Array String
+    { traditional : Array String
+    , simplified : Array String
     }
 
 
@@ -52,17 +52,18 @@ update msg _ =
 
         LoadDictionary (Ok dictionary) ->
             let
-                simplified =
+                traditional =
                     dictionary
                         |> String.split "\n"
                         |> List.filter (\line -> not (String.startsWith "#" line))
 
-                traditional =
-                    simplified |> List.sortBy toTraditional
+                simplified =
+                    traditional
+                        |> List.sortBy toSimplified
             in
             Dictionary
-                { simplified = Array.fromList simplified
-                , traditional = Array.fromList traditional
+                { traditional = Array.fromList traditional
+                , simplified = Array.fromList simplified
                 }
 
 
@@ -76,9 +77,9 @@ search searchText dictionaryData =
         Nothing
 
     else
-        case binarySearchSimplified searchText dictionaryData of
+        case binarySearchTraditional searchText dictionaryData of
             Nothing ->
-                case binarySearchTraditional searchText dictionaryData of
+                case binarySearchSimplified searchText dictionaryData of
                     Nothing ->
                         search (String.dropRight 1 searchText) dictionaryData
 
@@ -117,19 +118,6 @@ view searchText model =
 -- INTERNAL
 
 
-binarySearchSimplified : String -> DictionaryData -> Maybe Line
-binarySearchSimplified searchText dictionaryData =
-    binarySearch
-        { lower = 0
-        , upper = Array.length dictionaryData.simplified
-        , compareBy = toSimplified
-        , searchText = searchText
-        , dictionary = dictionaryData.simplified
-        }
-        |> Maybe.andThen (\i -> Array.get i dictionaryData.simplified)
-        |> Maybe.andThen parseLine
-
-
 binarySearchTraditional : String -> DictionaryData -> Maybe Line
 binarySearchTraditional searchText dictionaryData =
     binarySearch
@@ -140,6 +128,19 @@ binarySearchTraditional searchText dictionaryData =
         , dictionary = dictionaryData.traditional
         }
         |> Maybe.andThen (\i -> Array.get i dictionaryData.traditional)
+        |> Maybe.andThen parseLine
+
+
+binarySearchSimplified : String -> DictionaryData -> Maybe Line
+binarySearchSimplified searchText dictionaryData =
+    binarySearch
+        { lower = 0
+        , upper = Array.length dictionaryData.simplified
+        , compareBy = toSimplified
+        , searchText = searchText
+        , dictionary = dictionaryData.simplified
+        }
+        |> Maybe.andThen (\i -> Array.get i dictionaryData.simplified)
         |> Maybe.andThen parseLine
 
 
@@ -178,19 +179,19 @@ binarySearch props =
             binarySearch { props | upper = mid - 1 }
 
 
-toSimplified : String -> String
-toSimplified line =
-    line
-        |> parseLine
-        |> Maybe.map .simplified
-        |> Maybe.withDefault ""
-
-
 toTraditional : String -> String
 toTraditional line =
     line
         |> parseLine
         |> Maybe.map .traditional
+        |> Maybe.withDefault ""
+
+
+toSimplified : String -> String
+toSimplified line =
+    line
+        |> parseLine
+        |> Maybe.map .simplified
         |> Maybe.withDefault ""
 
 
@@ -215,9 +216,9 @@ parseLine line =
 lineParser : Parser Line
 lineParser =
     Parser.succeed
-        (\simplified traditional pinyin definitions ->
-            { simplified = simplified
-            , traditional = traditional
+        (\traditional simplified pinyin definitions ->
+            { traditional = traditional
+            , simplified = simplified
             , pinyin = pinyin
             , definitions = definitions |> String.dropRight 1 |> String.split "/"
             }
