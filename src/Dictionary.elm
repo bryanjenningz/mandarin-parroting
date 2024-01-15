@@ -64,33 +64,6 @@ update msg _ =
 
 
 
--- LINE
-
-
-type alias Line =
-    { simplified : String
-    , traditional : String
-    , pinyin : String
-    , definitions : List String
-    }
-
-
-parseLine : String -> Maybe Line
-parseLine line =
-    case line |> String.split "\t" of
-        [ simplified, traditional, pinyin, definitions ] ->
-            Just
-                { simplified = simplified
-                , traditional = traditional
-                , pinyin = pinyin
-                , definitions = definitions |> String.split "; "
-                }
-
-        _ ->
-            Nothing
-
-
-
 -- SEARCH
 
 
@@ -110,6 +83,10 @@ search searchText model =
 
                 Just line ->
                     Just line
+
+
+
+-- INTERNAL
 
 
 binarySearchSimplified : String -> DictionaryData -> Maybe Line
@@ -187,3 +164,30 @@ toTraditional line =
         |> parseLine
         |> Maybe.map .traditional
         |> Maybe.withDefault ""
+
+
+
+-- LINE
+
+
+type alias Line =
+    { simplified : String
+    , traditional : String
+    , pinyin : String
+    , definitions : List String
+    }
+
+
+parseLine : String -> Maybe Line
+parseLine line =
+    case line |> String.split "\t" of
+        [ simplified, traditional, pinyin, definitions ] ->
+            Just
+                { simplified = simplified
+                , traditional = traditional
+                , pinyin = pinyin
+                , definitions = definitions |> String.split "; "
+                }
+
+        _ ->
+            Nothing
