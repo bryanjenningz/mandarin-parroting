@@ -95,12 +95,21 @@ view searchText model =
 
 search : String -> DictionaryData -> Maybe Line
 search searchText dictionaryData =
-    case binarySearchSimplified searchText dictionaryData of
-        Nothing ->
-            binarySearchTraditional searchText dictionaryData
+    if String.isEmpty searchText then
+        Nothing
 
-        Just line ->
-            Just line
+    else
+        case binarySearchSimplified searchText dictionaryData of
+            Nothing ->
+                case binarySearchTraditional searchText dictionaryData of
+                    Nothing ->
+                        search (String.dropRight 1 searchText) dictionaryData
+
+                    Just line ->
+                        Just line
+
+            Just line ->
+                Just line
 
 
 binarySearchSimplified : String -> DictionaryData -> Maybe Line
