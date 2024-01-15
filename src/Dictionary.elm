@@ -1,7 +1,7 @@
 module Dictionary exposing (Model, Msg, fetch, init, search, update, view)
 
 import Array exposing (Array)
-import Html exposing (Html, article, div, h2, p, text)
+import Html exposing (Html, article, button, div, h2, p, text)
 import Html.Attributes exposing (class)
 import Http
 import Parser exposing ((|.), (|=), Parser)
@@ -235,13 +235,18 @@ lineParser =
 viewLine : Line -> Html msg
 viewLine line =
     article []
-        [ h2 [ class "text-2xl flex gap-3" ]
-            [ div [] [ text line.traditional ]
-            , if line.traditional /= line.simplified then
-                div [] [ text line.simplified ]
+        [ div [ class "flex justify-between gap-3" ]
+            [ h2 [ class "text-2xl flex gap-3" ]
+                [ div [] [ text line.traditional ]
+                , if line.traditional /= line.simplified then
+                    div [] [ text line.simplified ]
 
-              else
-                text ""
+                  else
+                    text ""
+                ]
+            , button
+                [ class "bg-blue-600 text-white w-6 h-6 rounded-lg flex justify-center items-center text-sm font-bold" ]
+                [ text "+" ]
             ]
         , div [ class "text-lg" ] [ text line.pinyin ]
         , p [ class "text-lg" ] [ text (String.join "; " line.definitions) ]
