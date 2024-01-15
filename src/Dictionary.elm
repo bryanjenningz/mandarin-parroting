@@ -235,7 +235,7 @@ lineParser =
 viewLine : Line -> Html msg
 viewLine line =
     article []
-        [ h2 [] [ text (line.traditional ++ " " ++ line.simplified) ]
-        , div [] [ text line.pinyin ]
-        , p [] [ text (String.join "; " line.definitions) ]
+        [ h2 [ class "text-2xl" ] [ text (line.traditional ++ " " ++ line.simplified) ]
+        , div [ class "text-lg" ] [ text line.pinyin ]
+        , p [ class "text-lg" ] [ text (String.join "; " line.definitions) ]
         ]
