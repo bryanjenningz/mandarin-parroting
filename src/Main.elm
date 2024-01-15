@@ -43,10 +43,7 @@ init : Value -> ( Model, Cmd Msg )
 init value =
     let
         flags =
-            value
-                |> Decode.decodeValue Decode.string
-                |> Result.andThen (Decode.decodeString flagsDecoder)
-                |> Result.withDefault flagsDefault
+            decodeFlags value
     in
     ( { tab = SelectVideoTab
       , videoId = flags.videoId
@@ -89,6 +86,14 @@ flagsDefault =
     , videoSpeed = 100
     , videos = []
     }
+
+
+decodeFlags : Value -> Flags
+decodeFlags value =
+    value
+        |> Decode.decodeValue Decode.string
+        |> Result.andThen (Decode.decodeString flagsDecoder)
+        |> Result.withDefault flagsDefault
 
 
 
