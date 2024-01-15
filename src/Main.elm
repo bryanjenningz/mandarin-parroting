@@ -333,7 +333,7 @@ viewVideoSlider videoTime video =
 
 
 viewVideoControls : Model -> Html Msg
-viewVideoControls model =
+viewVideoControls { videoIsPlaying, videoSpeed } =
     div [ class "w-full flex justify-between gap-2" ]
         [ div [ class "basis-1 grow" ] []
         , div [ class "flex gap-2" ]
@@ -342,7 +342,8 @@ viewVideoControls model =
                 , class "bg-blue-600 rounded-lg w-12 h-12"
                 ]
                 [ labeledSymbol "Rewind" "<<" ]
-            , playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
+            , playButton videoIsPlaying
+                [ class "bg-blue-600 rounded-lg w-12 h-12" ]
             , button
                 [ onClick FastForward
                 , class "bg-blue-600 rounded-lg w-12 h-12"
@@ -350,7 +351,7 @@ viewVideoControls model =
                 [ labeledSymbol "Fast-forward" ">>" ]
             ]
         , div [ class "basis-1 grow" ]
-            [ viewVideoSpeed model.videoSpeed ]
+            [ viewVideoSpeed videoSpeed ]
         ]
 
 
@@ -429,7 +430,7 @@ labeledSymbol label symbol =
 
 
 viewVideoCard : Model -> Video -> Html Msg
-viewVideoCard model video =
+viewVideoCard { videoId, videoIsPlaying } video =
     div [ class "px-5 py-5 border border-white rounded-lg mx-auto w-full" ]
         [ div [ class "flex flex-col gap-4" ]
             [ h2 [ class "text-xl" ] [ text video.title ]
@@ -439,8 +440,8 @@ viewVideoCard model video =
                     , class "py-2 px-4 bg-blue-600 rounded-lg"
                     ]
                     [ text "Practice" ]
-                , if model.videoId == Just video.videoId then
-                    playButton model [ class "bg-blue-600 rounded-lg w-12 h-12" ]
+                , if videoId == Just video.videoId then
+                    playButton videoIsPlaying [ class "bg-blue-600 rounded-lg w-12 h-12" ]
 
                   else
                     text ""
@@ -449,9 +450,9 @@ viewVideoCard model video =
         ]
 
 
-playButton : Model -> List (Attribute Msg) -> Html Msg
-playButton model attributes =
-    if model.videoIsPlaying then
+playButton : Bool -> List (Attribute Msg) -> Html Msg
+playButton videoIsPlaying attributes =
+    if videoIsPlaying then
         button (attributes ++ [ onClick PauseVideo ])
             [ labeledSymbol "Pause" "||" ]
 
