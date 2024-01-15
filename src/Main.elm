@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser
+import Dictionary
 import Flags exposing (Flags)
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes exposing (class, classList)
@@ -35,6 +36,8 @@ type alias Model =
     , videos : List Video
     , newVideo : NewVideo
     , newVideoError : Maybe NewVideo.Error
+    , dictionary : Dictionary.Model
+    , dictionaryLookup : Maybe ( Subtitle, Int )
     }
 
 
@@ -52,8 +55,10 @@ init value =
       , videos = flags.videos
       , newVideo = NewVideo.empty
       , newVideoError = Nothing
+      , dictionary = Dictionary.init
+      , dictionaryLookup = Nothing
       }
-    , Cmd.none
+    , Dictionary.fetch DictionaryMsg
     )
 
 
@@ -77,6 +82,8 @@ type Msg
     | SetNewVideoTranscript String
     | SubmitNewVideo
     | AddVideo Video
+    | DictionaryMsg Dictionary.Msg
+    | SetDictionaryLookup (Maybe ( Subtitle, Int ))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -212,6 +219,14 @@ update msg model =
                 , videos = newModel.videos
                 }
             )
+
+        DictionaryMsg dictionaryMsg ->
+            ( { model | dictionary = Dictionary.update dictionaryMsg model.dictionary }
+            , Cmd.none
+            )
+
+        SetDictionaryLookup dictionaryLookup ->
+            ( { model | dictionaryLookup = dictionaryLookup }, Cmd.none )
 
 
 
@@ -369,6 +384,9 @@ viewPlayVideoTab model =
                             { currentSubtitle = subtitle
                             , subtitles = video.subtitles
                             , setVideoTime = SetVideoTime
+                            , dictionary = model.dictionary
+                            , dictionaryLookup = model.dictionaryLookup
+                            , setDictionaryLookup = SetDictionaryLookup
                             }
                 ]
 

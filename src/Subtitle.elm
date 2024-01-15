@@ -1,7 +1,8 @@
 module Subtitle exposing (Subtitle, at, decoder, fromTranscript, jumpTo, next, prev, timeParser, view)
 
 import Browser.Dom as Dom
-import Html exposing (Html, div, text)
+import Dictionary
+import Html exposing (Html, button, div, span, text)
 import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder)
@@ -92,25 +93,71 @@ type alias ViewSubtitlesProps msg =
     { currentSubtitle : Subtitle
     , subtitles : List Subtitle
     , setVideoTime : Float -> msg
+    , dictionary : Dictionary.Model
+    , dictionaryLookup : Maybe ( Subtitle, Int )
+    , setDictionaryLookup : Maybe ( Subtitle, Int ) -> msg
     }
 
 
 view : ViewSubtitlesProps msg -> Html msg
 view props =
     div [ Attr.id subtitlesContainerId, class "overflow-y-scroll" ]
-        (props.subtitles
-            |> List.map
-                (\subtitle ->
-                    div
-                        [ class "text-center text-2xl"
-                        , classList
-                            [ ( "text-blue-400", subtitle == props.currentSubtitle ) ]
-                        , onClick (props.setVideoTime subtitle.time)
-                        , Attr.id (subtitleId subtitle)
-                        ]
-                        [ text subtitle.text ]
-                )
-        )
+        [ div []
+            (props.subtitles
+                |> List.map
+                    (\subtitle ->
+                        div
+                            [ class "text-2xl flex justify-between items-center"
+                            , classList
+                                [ ( "text-blue-400", subtitle == props.currentSubtitle ) ]
+                            , Attr.id (subtitleId subtitle)
+                            ]
+                            [ div []
+                                (List.indexedMap
+                                    (\i char ->
+                                        let
+                                            selected =
+                                                props.dictionaryLookup
+                                                    |> Maybe.map (\( sub, index ) -> sub == subtitle && index == i)
+                                                    |> Maybe.withDefault False
+                                        in
+                                        span
+                                            [ onClick (props.setDictionaryLookup (Just ( subtitle, i )))
+                                            , class "relative"
+                                            , classList [ ( "bg-blue-600 text-white", selected ) ]
+                                            ]
+                                            [ text char
+                                            , if selected then
+                                                div [ class "absolute top-100 min-w-64 z-20 bg-black text-white p-4 rounded-lg border border-white" ]
+                                                    [ Dictionary.view (String.dropLeft i subtitle.text)
+                                                        props.dictionary
+                                                    ]
+
+                                              else
+                                                text ""
+                                            ]
+                                    )
+                                    (String.split "" subtitle.text)
+                                )
+                            , button
+                                [ onClick (props.setVideoTime subtitle.time)
+                                , class "bg-blue-600 text-white rounded-lg w-6 h-6 text-sm"
+                                ]
+                                [ text "▶" ]
+                            ]
+                    )
+            )
+        , case props.dictionaryLookup of
+            Nothing ->
+                text ""
+
+            Just _ ->
+                div
+                    [ class "absolute inset-0 z-10"
+                    , onClick (props.setDictionaryLookup Nothing)
+                    ]
+                    []
+        ]
 
 
 

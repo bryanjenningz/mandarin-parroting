@@ -1,6 +1,8 @@
-module Dictionary exposing (Model, Msg, init, search, update)
+module Dictionary exposing (Model, Msg, fetch, init, search, update, view)
 
 import Array exposing (Array)
+import Html exposing (Html, article, div, h2, p, text)
+import Html.Attributes exposing (class)
 import Http
 
 
@@ -11,7 +13,7 @@ import Http
 type Model
     = EmptyDictionary
     | Dictionary DictionaryData
-    | FailedToLoadDictionary Http.Error
+    | FailedToLoadDictionary
 
 
 type alias DictionaryData =
@@ -20,16 +22,16 @@ type alias DictionaryData =
     }
 
 
-init : ( Model, Cmd Msg )
+init : Model
 init =
-    ( EmptyDictionary, fetch )
+    EmptyDictionary
 
 
-fetch : Cmd Msg
-fetch =
+fetch : (Msg -> msg) -> Cmd msg
+fetch toMsg =
     Http.get
         { url = "/dictionary.txt"
-        , expect = Http.expectString LoadDictionary
+        , expect = Http.expectString (toMsg << LoadDictionary)
         }
 
 
@@ -41,11 +43,11 @@ type Msg
     = LoadDictionary (Result Http.Error String)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> Model
 update msg _ =
     case msg of
-        LoadDictionary (Err error) ->
-            ( FailedToLoadDictionary error, Cmd.none )
+        LoadDictionary (Err _) ->
+            FailedToLoadDictionary
 
         LoadDictionary (Ok dictionary) ->
             let
@@ -55,34 +57,57 @@ update msg _ =
                 traditional =
                     simplified |> List.sortBy toTraditional
             in
-            ( Dictionary
+            Dictionary
                 { simplified = Array.fromList simplified
                 , traditional = Array.fromList traditional
                 }
-            , Cmd.none
-            )
 
 
 
 -- SEARCH
 
 
-search : String -> Model -> Maybe Line
-search searchText model =
-    case model of
-        EmptyDictionary ->
-            Nothing
+search : String -> DictionaryData -> Maybe Line
+search searchText dictionaryData =
+    case binarySearchSimplified searchText dictionaryData of
+        Nothing ->
+            binarySearchTraditional searchText dictionaryData
 
-        FailedToLoadDictionary _ ->
-            Nothing
+        Just line ->
+            Just line
 
-        Dictionary dictionaryData ->
-            case binarySearchSimplified searchText dictionaryData of
-                Nothing ->
-                    binarySearchTraditional searchText dictionaryData
 
-                Just line ->
-                    Just line
+
+-- VIEW
+
+
+view : String -> Model -> Html msg
+view searchText model =
+    div [ class "bg-black text-white z-10" ]
+        [ case model of
+            EmptyDictionary ->
+                text "Waiting for dictionary to load..."
+
+            FailedToLoadDictionary ->
+                text "Failed to load dictionary."
+
+            Dictionary dictionaryData ->
+                case search searchText dictionaryData of
+                    Nothing ->
+                        text ("No results for the text \"" ++ searchText ++ "\"")
+
+                    Just line ->
+                        viewLine line
+        ]
+
+
+viewLine : Line -> Html msg
+viewLine line =
+    article [ class "flex flex-col p-4 gap-4 border border-white rounded-lg bg-black text-white" ]
+        [ h2 [] [ text (line.traditional ++ " " ++ line.simplified) ]
+        , div [] [ text line.pinyin ]
+        , p [] [ text (String.join "; " line.definitions) ]
+        ]
 
 
 
