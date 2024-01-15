@@ -159,7 +159,7 @@ update msg model =
             ( model, setVideoTime videoTime )
 
         JumpToSubtitle subtitle ->
-            ( model, jumpToSubtitle subtitle )
+            ( model, jumpToSubtitle { subtitle = subtitle, noop = NoOp } )
 
         SetVideoSpeed videoSpeed ->
             let
@@ -405,8 +405,14 @@ subtitleId subtitle =
     "sub" ++ String.fromFloat subtitle.time
 
 
-jumpToSubtitle : Subtitle -> Cmd Msg
-jumpToSubtitle subtitle =
+type alias JumpToSubtitleProps msg =
+    { subtitle : Subtitle
+    , noop : msg
+    }
+
+
+jumpToSubtitle : JumpToSubtitleProps msg -> Cmd msg
+jumpToSubtitle props =
     let
         padding =
             500
@@ -414,7 +420,7 @@ jumpToSubtitle subtitle =
     Dom.getViewportOf subtitlesContainerId
         |> Task.andThen
             (\{ viewport } ->
-                Dom.getElement (subtitleId subtitle)
+                Dom.getElement (subtitleId props.subtitle)
                     |> Task.map (\{ element } -> ( viewport, element ))
             )
         |> Task.andThen
@@ -423,7 +429,7 @@ jumpToSubtitle subtitle =
                     0
                     (viewport.y + element.y - padding)
             )
-        |> Task.attempt (\_ -> NoOp)
+        |> Task.attempt (\_ -> props.noop)
 
 
 
