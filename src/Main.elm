@@ -39,6 +39,32 @@ type alias Model =
     }
 
 
+init : Value -> ( Model, Cmd Msg )
+init value =
+    let
+        flags =
+            value
+                |> Decode.decodeValue Decode.string
+                |> Result.andThen (Decode.decodeString flagsDecoder)
+                |> Result.withDefault flagsDefault
+    in
+    ( { tab = SelectVideoTab
+      , videoId = flags.videoId
+      , videoIsPlaying = False
+      , videoTime = 0
+      , videoSpeed = flags.videoSpeed
+      , videos = flags.videos
+      , newVideo = NewVideo.empty
+      , newVideoError = Nothing
+      }
+    , Cmd.none
+    )
+
+
+
+-- FLAGS
+
+
 type alias Flags =
     { videoId : Maybe VideoId
     , videoSpeed : Int
@@ -63,28 +89,6 @@ flagsDefault =
     , videoSpeed = 100
     , videos = []
     }
-
-
-init : Value -> ( Model, Cmd Msg )
-init value =
-    let
-        flags =
-            value
-                |> Decode.decodeValue Decode.string
-                |> Result.andThen (Decode.decodeString flagsDecoder)
-                |> Result.withDefault flagsDefault
-    in
-    ( { tab = SelectVideoTab
-      , videoId = flags.videoId
-      , videoIsPlaying = False
-      , videoTime = 0
-      , videoSpeed = flags.videoSpeed
-      , videos = flags.videos
-      , newVideo = NewVideo.empty
-      , newVideoError = Nothing
-      }
-    , Cmd.none
-    )
 
 
 
