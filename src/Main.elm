@@ -2,14 +2,14 @@ port module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing (Attribute, Html, button, div, h2, input, span, text)
-import Html.Attributes as Attr exposing (attribute, class, classList)
+import Html exposing (Html, button, div, h2, input, text)
+import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick, onInput)
 import List.Extra as List
 import NewVideo exposing (NewVideo)
 import Subtitles exposing (Subtitle, Subtitles)
 import Task
-import Video exposing (Video, VideoId)
+import Video exposing (Video, VideoId, viewCard, viewControls)
 import VideoTime exposing (VideoTime)
 
 
@@ -246,7 +246,17 @@ viewSelectVideoTab model =
             , newVideoError = model.newVideoError
             }
         , div [ class "flex flex-col gap-4" ]
-            (List.map (viewVideoCard model) model.videos)
+            (List.map
+                (viewCard
+                    { pauseVideo = PauseVideo
+                    , playVideo = PlayVideo
+                    , startVideo = StartVideo
+                    , videoId = model.videoId
+                    , videoIsPlaying = model.videoIsPlaying
+                    }
+                )
+                model.videos
+            )
         ]
 
 
@@ -300,7 +310,7 @@ viewPlayVideoTab model =
                     Just subtitle ->
                         button [ onClick (JumpToSubtitle subtitle), class "text-xl" ]
                             [ text subtitle.text ]
-                , viewVideoControls
+                , viewControls
                     { videoIsPlaying = model.videoIsPlaying
                     , videoSpeed = model.videoSpeed
                     , fastForward = FastForward
@@ -337,71 +347,6 @@ viewVideoSlider videoTime video =
             , class "block w-full mx-auto"
             ]
             []
-        ]
-
-
-type alias VideoControlsProps msg =
-    { videoIsPlaying : Bool
-    , videoSpeed : Int
-    , fastForward : msg
-    , fastRewind : msg
-    , setVideoSpeed : Int -> msg
-    , playVideo : msg
-    , pauseVideo : msg
-    }
-
-
-viewVideoControls : VideoControlsProps msg -> Html msg
-viewVideoControls props =
-    div [ class "w-full flex justify-between gap-2" ]
-        [ div [ class "basis-1 grow" ] []
-        , div [ class "flex gap-2" ]
-            [ button
-                [ onClick props.fastRewind
-                , class "bg-blue-600 rounded-lg w-12 h-12"
-                ]
-                [ labeledSymbol "Rewind" "<<" ]
-            , playButton
-                { videoIsPlaying = props.videoIsPlaying
-                , playVideo = props.playVideo
-                , pauseVideo = props.pauseVideo
-                }
-                [ class "bg-blue-600 rounded-lg w-12 h-12" ]
-            , button
-                [ onClick props.fastForward
-                , class "bg-blue-600 rounded-lg w-12 h-12"
-                ]
-                [ labeledSymbol "Fast-forward" ">>" ]
-            ]
-        , div [ class "basis-1 grow" ]
-            [ viewVideoSpeed
-                { videoSpeed = props.videoSpeed
-                , setVideoSpeed = props.setVideoSpeed
-                }
-            ]
-        ]
-
-
-type alias VideoSpeedProps msg =
-    { videoSpeed : Int
-    , setVideoSpeed : Int -> msg
-    }
-
-
-viewVideoSpeed : VideoSpeedProps msg -> Html msg
-viewVideoSpeed props =
-    div [ class "flex justify-end items-center gap-1" ]
-        [ button
-            [ onClick (props.setVideoSpeed (props.videoSpeed - 5))
-            , class "bg-blue-600 rounded-lg w-6 h-12"
-            ]
-            [ text "-" ]
-        , div [ class "text-xs" ] [ text (String.fromInt props.videoSpeed ++ "%") ]
-        , button
-            [ onClick (props.setVideoSpeed (props.videoSpeed + 5))
-            , class "bg-blue-600 rounded-lg w-6 h-12"
-            ]
-            [ text "+" ]
         ]
 
 
@@ -452,58 +397,6 @@ jumpToSubtitle subtitle =
                     (viewport.y + element.y - padding)
             )
         |> Task.attempt (\_ -> NoOp)
-
-
-labeledSymbol : String -> String -> Html msg
-labeledSymbol label symbol =
-    span []
-        [ span [ attribute "aria-hidden" "true" ] [ text symbol ]
-        , span [ class "sr-only" ] [ text label ]
-        ]
-
-
-viewVideoCard : Model -> Video -> Html Msg
-viewVideoCard model video =
-    div [ class "px-5 py-5 border border-white rounded-lg mx-auto w-full" ]
-        [ div [ class "flex flex-col gap-4" ]
-            [ h2 [ class "text-xl" ] [ text video.title ]
-            , div [ class "flex justify-between" ]
-                [ button
-                    [ onClick (StartVideo video.videoId)
-                    , class "py-2 px-4 bg-blue-600 rounded-lg"
-                    ]
-                    [ text "Practice" ]
-                , if model.videoId == Just video.videoId then
-                    playButton
-                        { videoIsPlaying = model.videoIsPlaying
-                        , playVideo = PlayVideo
-                        , pauseVideo = PauseVideo
-                        }
-                        [ class "bg-blue-600 rounded-lg w-12 h-12" ]
-
-                  else
-                    text ""
-                ]
-            ]
-        ]
-
-
-type alias PlayButtonProps msg =
-    { videoIsPlaying : Bool
-    , playVideo : msg
-    , pauseVideo : msg
-    }
-
-
-playButton : PlayButtonProps msg -> List (Attribute msg) -> Html msg
-playButton props attributes =
-    if props.videoIsPlaying then
-        button (attributes ++ [ onClick props.pauseVideo ])
-            [ labeledSymbol "Pause" "||" ]
-
-    else
-        button (attributes ++ [ onClick props.playVideo ])
-            [ labeledSymbol "Play" "▶" ]
 
 
 
