@@ -1,4 +1,4 @@
-module Dictionary exposing (Model, Msg, fetch, init, update, view)
+module Dictionary exposing (Model, Msg, fetch, init, search, update, view)
 
 import Array exposing (Array)
 import Html exposing (Html, article, div, h2, p, text)
@@ -66,6 +66,29 @@ update msg _ =
 
 
 
+-- SEARCH
+
+
+search : String -> DictionaryData -> Maybe Line
+search searchText dictionaryData =
+    if String.isEmpty searchText then
+        Nothing
+
+    else
+        case binarySearchSimplified searchText dictionaryData of
+            Nothing ->
+                case binarySearchTraditional searchText dictionaryData of
+                    Nothing ->
+                        search (String.dropRight 1 searchText) dictionaryData
+
+                    Just line ->
+                        Just line
+
+            Just line ->
+                Just line
+
+
+
 -- VIEW
 
 
@@ -91,25 +114,6 @@ view searchText model =
 
 
 -- INTERNAL
-
-
-search : String -> DictionaryData -> Maybe Line
-search searchText dictionaryData =
-    if String.isEmpty searchText then
-        Nothing
-
-    else
-        case binarySearchSimplified searchText dictionaryData of
-            Nothing ->
-                case binarySearchTraditional searchText dictionaryData of
-                    Nothing ->
-                        search (String.dropRight 1 searchText) dictionaryData
-
-                    Just line ->
-                        Just line
-
-            Just line ->
-                Just line
 
 
 binarySearchSimplified : String -> DictionaryData -> Maybe Line
