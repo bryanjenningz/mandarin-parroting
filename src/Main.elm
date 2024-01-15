@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Browser
 import Dictionary
 import Flags exposing (Flags)
+import Flashcard exposing (Flashcard)
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
@@ -38,6 +39,7 @@ type alias Model =
     , newVideoError : Maybe NewVideo.Error
     , dictionary : Dictionary.Model
     , dictionaryLookup : Maybe ( Subtitle, Int )
+    , flashcards : List Flashcard
     }
 
 
@@ -57,6 +59,7 @@ init value =
       , newVideoError = Nothing
       , dictionary = Dictionary.init
       , dictionaryLookup = Nothing
+      , flashcards = flags.flashcards
       }
     , Dictionary.fetch DictionaryMsg
     )
@@ -84,6 +87,8 @@ type Msg
     | AddVideo Video
     | DictionaryMsg Dictionary.Msg
     | SetDictionaryLookup (Maybe ( Subtitle, Int ))
+    | SaveFlashcard Flashcard
+    | DeleteFlashcard Flashcard
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -120,6 +125,7 @@ update msg model =
                     { videoId = newModel.videoId
                     , videoSpeed = newModel.videoSpeed
                     , videos = newModel.videos
+                    , flashcards = newModel.flashcards
                     }
                 ]
             )
@@ -183,6 +189,7 @@ update msg model =
                     { videoId = newModel.videoId
                     , videoSpeed = newModel.videoSpeed
                     , videos = newModel.videos
+                    , flashcards = newModel.flashcards
                     }
                 ]
             )
@@ -217,6 +224,7 @@ update msg model =
                 { videoId = newModel.videoId
                 , videoSpeed = newModel.videoSpeed
                 , videos = newModel.videos
+                , flashcards = newModel.flashcards
                 }
             )
 
@@ -227,6 +235,48 @@ update msg model =
 
         SetDictionaryLookup dictionaryLookup ->
             ( { model | dictionaryLookup = dictionaryLookup }, Cmd.none )
+
+        SaveFlashcard flashcard ->
+            let
+                newModel =
+                    { model
+                        | flashcards =
+                            List.map
+                                (\card ->
+                                    if card == flashcard then
+                                        flashcard
+
+                                    else
+                                        card
+                                )
+                                model.flashcards
+                    }
+            in
+            ( newModel
+            , saveFlags
+                { videoId = newModel.videoId
+                , videoSpeed = newModel.videoSpeed
+                , videos = newModel.videos
+                , flashcards = newModel.flashcards
+                }
+            )
+
+        DeleteFlashcard flashcard ->
+            let
+                newModel =
+                    { model
+                        | flashcards =
+                            List.filter (\card -> card /= flashcard) model.flashcards
+                    }
+            in
+            ( newModel
+            , saveFlags
+                { videoId = newModel.videoId
+                , videoSpeed = newModel.videoSpeed
+                , videos = newModel.videos
+                , flashcards = newModel.flashcards
+                }
+            )
 
 
 
