@@ -10,8 +10,14 @@ import Http
 
 type Model
     = EmptyDictionary
-    | Dictionary { simplified : Array String, traditional : Array String }
+    | Dictionary DictionaryData
     | FailedToLoadDictionary Http.Error
+
+
+type alias DictionaryData =
+    { simplified : Array String
+    , traditional : Array String
+    }
 
 
 init : ( Model, Cmd Msg )
@@ -84,6 +90,10 @@ parseLine line =
             Nothing
 
 
+
+-- SEARCH
+
+
 search : String -> Model -> Maybe Line
 search searchText model =
     case model of
@@ -94,17 +104,73 @@ search searchText model =
             Nothing
 
         Dictionary dictionaryData ->
-            case search_ searchText toSimplified dictionaryData.simplified of
+            case binarySearchSimplified searchText dictionaryData of
                 Nothing ->
-                    search_ searchText toTraditional dictionaryData.traditional
+                    binarySearchTraditional searchText dictionaryData
 
                 Just line ->
                     Just line
 
 
-search_ : String -> (String -> String) -> Array String -> Maybe Line
-search_ searchText toSortKey dictionaryData =
-    Nothing
+binarySearchSimplified : String -> DictionaryData -> Maybe Line
+binarySearchSimplified searchText dictionaryData =
+    binarySearch
+        { lower = 0
+        , upper = Array.length dictionaryData.simplified
+        , compareBy = toSimplified
+        , searchText = searchText
+        , dictionary = dictionaryData.simplified
+        }
+        |> Maybe.andThen (\i -> Array.get i dictionaryData.simplified)
+        |> Maybe.andThen parseLine
+
+
+binarySearchTraditional : String -> DictionaryData -> Maybe Line
+binarySearchTraditional searchText dictionaryData =
+    binarySearch
+        { lower = 0
+        , upper = Array.length dictionaryData.traditional
+        , compareBy = toTraditional
+        , searchText = searchText
+        , dictionary = dictionaryData.traditional
+        }
+        |> Maybe.andThen (\i -> Array.get i dictionaryData.traditional)
+        |> Maybe.andThen parseLine
+
+
+type alias BinarySearchProps =
+    { lower : Int
+    , upper : Int
+    , compareBy : String -> String
+    , searchText : String
+    , dictionary : Array String
+    }
+
+
+binarySearch : BinarySearchProps -> Maybe Int
+binarySearch props =
+    if props.lower > props.upper then
+        Nothing
+
+    else
+        let
+            mid =
+                (props.lower + props.upper) // 2
+
+            midText =
+                props.dictionary
+                    |> Array.get mid
+                    |> Maybe.map props.compareBy
+                    |> Maybe.withDefault ""
+        in
+        if props.searchText == midText then
+            Just mid
+
+        else if props.searchText > midText then
+            binarySearch { props | lower = mid + 1 }
+
+        else
+            binarySearch { props | upper = mid - 1 }
 
 
 toSimplified : String -> String
