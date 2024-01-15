@@ -5,7 +5,7 @@ import Html exposing (Html, article, button, div, h2, input, label, text, textar
 import Html.Attributes exposing (class, for, id)
 import Html.Events exposing (onClick, onInput)
 import Parser exposing (DeadEnd)
-import Subtitles exposing (Subtitle)
+import Subtitle exposing (Subtitle)
 import Video exposing (VideoId)
 
 
@@ -64,7 +64,7 @@ validate (NewVideo newVideo) =
         Err EmptyTranscript
 
     else
-        case Subtitles.fromTranscript newVideo.newVideoTranscript of
+        case Subtitle.fromTranscript newVideo.newVideoTranscript of
             Err deadEnds ->
                 Err (InvalidTranscript deadEnds)
 

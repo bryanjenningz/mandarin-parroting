@@ -5,7 +5,7 @@ import Html.Attributes as Attr exposing (attribute, class)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
-import Subtitles exposing (Subtitles)
+import Subtitle exposing (Subtitle)
 import VideoTime exposing (VideoTime)
 
 
@@ -17,7 +17,7 @@ type alias Video =
     { videoId : VideoId
     , title : String
     , duration : VideoTime
-    , subtitles : Subtitles
+    , subtitles : List Subtitle
     }
 
 
@@ -34,7 +34,7 @@ decoder =
         (Decode.field "videoId" Decode.string)
         (Decode.field "title" Decode.string)
         (Decode.field "duration" Decode.float)
-        (Decode.field "subtitles" (Decode.list Subtitles.decoder))
+        (Decode.field "subtitles" (Decode.list Subtitle.decoder))
 
 
 getById : Maybe VideoId -> List Video -> Maybe Video

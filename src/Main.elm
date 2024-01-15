@@ -8,7 +8,7 @@ import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
 import Json.Decode exposing (Value)
 import NewVideo exposing (NewVideo)
-import Subtitles exposing (Subtitle, Subtitles)
+import Subtitle exposing (Subtitle)
 import Task
 import Video exposing (Video, VideoId)
 import VideoTime exposing (VideoTime)
@@ -126,7 +126,7 @@ update msg model =
                 maybeNextSubtitleTime =
                     Video.getById model.videoId model.videos
                         |> Maybe.map .subtitles
-                        |> Maybe.andThen (Subtitles.next model.videoTime)
+                        |> Maybe.andThen (Subtitle.next model.videoTime)
                         |> Maybe.map .time
             in
             case maybeNextSubtitleTime of
@@ -142,7 +142,7 @@ update msg model =
                 maybePrevSubtitleTime =
                     Video.getById model.videoId model.videos
                         |> Maybe.map .subtitles
-                        |> Maybe.andThen (Subtitles.prev model.videoTime)
+                        |> Maybe.andThen (Subtitle.prev model.videoTime)
                         |> Maybe.map .time
             in
             case maybePrevSubtitleTime of
@@ -325,7 +325,7 @@ viewPlayVideoTab model =
         Just video ->
             let
                 currentSubtitle =
-                    Subtitles.at model.videoTime video.subtitles
+                    Subtitle.at model.videoTime video.subtitles
             in
             div [ class "flex flex-col items-center gap-2 h-[80vh]" ]
                 [ div [ class "text-xl text-center" ] [ text video.title ]
@@ -366,7 +366,7 @@ viewPlayVideoTab model =
                 ]
 
 
-viewSubtitles : Subtitle -> Subtitles -> Html Msg
+viewSubtitles : Subtitle -> List Subtitle -> Html Msg
 viewSubtitles currentSubtitle subtitles =
     div [ Attr.id subtitlesContainerId, class "overflow-y-scroll" ]
         (subtitles
