@@ -36,13 +36,13 @@
       app.ports.saveFlags.subscribe(saveFlags);
 
       function startVideo(videoId) {
-        if (!player || !player.loadVideoById) return initVideo(videoId);
+        if (!player?.loadVideoById) return initVideo(videoId);
         player.loadVideoById(videoId);
         playVideo();
       }
 
       function playVideo() {
-        if (!player) return initVideo();
+        if (!player?.playVideo) return initVideo();
         player.playVideo();
         isPlaying = true;
         if (!intervalId) {
@@ -51,7 +51,7 @@
       }
 
       function pauseVideo() {
-        if (!player) return initVideo();
+        if (!player?.pauseVideo) return initVideo();
         player.pauseVideo();
         isPlaying = false;
         clearInterval(intervalId);
@@ -59,7 +59,7 @@
       }
 
       function getVideoTime() {
-        if (!player) return initVideo();
+        if (!player?.getCurrentTime) return initVideo();
         const time = player.getCurrentTime() || 0;
         if (isPlaying && time >= player.getDuration()) {
           player.seekTo(0);
@@ -69,7 +69,7 @@
       }
 
       function setVideoTime(videoTime) {
-        if (!player) return initVideo();
+        if (!player?.seekTo) return initVideo();
         player.seekTo(videoTime);
         app.ports.getVideoTime.send(videoTime);
       }
@@ -102,7 +102,7 @@
       }
 
       function initVideo(videoId = DEFAULT_VIDEO_ID) {
-        if (player) return;
+        if (player || window.onYouTubeIframeAPIReady) return;
         const tag = document.createElement("script");
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName("script")[0];
