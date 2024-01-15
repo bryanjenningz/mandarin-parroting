@@ -238,7 +238,7 @@ view model =
     div [ class "flex flex-col items-center" ]
         [ div [ class "fixed w-full" ] [ viewTabs model ]
         , div [ class "w-full max-w-2xl" ]
-            [ div [ class "pt-24 px-3" ]
+            [ div [ class "pt-20 px-3" ]
                 [ case model.tab of
                     SelectVideoTab ->
                         viewSelectVideoTab model
