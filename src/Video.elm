@@ -42,7 +42,7 @@ type alias VideoControlsProps msg =
 
 viewControls : VideoControlsProps msg -> Html msg
 viewControls props =
-    div [ class "w-full flex justify-between gap-2" ]
+    div [ class "w-full flex justify-between items-center gap-2" ]
         [ div [ class "basis-1 grow" ] []
         , div [ class "flex gap-2" ]
             [ button
@@ -149,13 +149,13 @@ viewSpeed props =
     div [ class "flex justify-end items-center gap-1" ]
         [ button
             [ onClick (props.setVideoSpeed (props.videoSpeed - 5))
-            , class "bg-blue-600 rounded-lg w-6 h-12"
+            , class "bg-blue-600 rounded-lg w-6 h-6"
             ]
             [ text "-" ]
         , div [ class "text-xs" ] [ text (String.fromInt props.videoSpeed ++ "%") ]
         , button
             [ onClick (props.setVideoSpeed (props.videoSpeed + 5))
-            , class "bg-blue-600 rounded-lg w-6 h-12"
+            , class "bg-blue-600 rounded-lg w-6 h-6"
             ]
             [ text "+" ]
         ]
