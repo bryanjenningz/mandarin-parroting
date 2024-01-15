@@ -86,7 +86,19 @@ update msg model =
             ( model, Cmd.none )
 
         TabClicked tab ->
-            ( { model | tab = tab }, Cmd.none )
+            ( { model | tab = tab }
+            , case Video.getById model.videoId model.videos of
+                Nothing ->
+                    Cmd.none
+
+                Just video ->
+                    case Subtitle.at model.videoTime video.subtitles of
+                        Nothing ->
+                            Cmd.none
+
+                        Just subtitle ->
+                            Subtitle.jumpTo { subtitle = subtitle, noop = NoOp }
+            )
 
         StartVideo videoId ->
             let
