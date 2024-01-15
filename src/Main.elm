@@ -1,15 +1,13 @@
 port module Main exposing (main)
 
 import Browser
-import Browser.Dom as Dom
 import Flags exposing (Flags)
 import Html exposing (Html, button, div, h2, text)
-import Html.Attributes as Attr exposing (class, classList)
+import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Json.Decode exposing (Value)
 import NewVideo exposing (NewVideo)
 import Subtitle exposing (Subtitle)
-import Task
 import Video exposing (Video, VideoId)
 import VideoTime exposing (VideoTime)
 
@@ -159,7 +157,7 @@ update msg model =
             ( model, setVideoTime videoTime )
 
         JumpToSubtitle subtitle ->
-            ( model, jumpToSubtitle { subtitle = subtitle, noop = NoOp } )
+            ( model, Subtitle.jumpTo { subtitle = subtitle, noop = NoOp } )
 
         SetVideoSpeed videoSpeed ->
             let
@@ -362,74 +360,12 @@ viewPlayVideoTab model =
                         text ""
 
                     Just subtitle ->
-                        viewSubtitles
+                        Subtitle.view
                             { currentSubtitle = subtitle
                             , subtitles = video.subtitles
                             , setVideoTime = SetVideoTime
                             }
                 ]
-
-
-type alias ViewSubtitlesProps msg =
-    { currentSubtitle : Subtitle
-    , subtitles : List Subtitle
-    , setVideoTime : Float -> msg
-    }
-
-
-viewSubtitles : ViewSubtitlesProps msg -> Html msg
-viewSubtitles props =
-    div [ Attr.id subtitlesContainerId, class "overflow-y-scroll" ]
-        (props.subtitles
-            |> List.map
-                (\subtitle ->
-                    div
-                        [ class "text-center text-2xl"
-                        , classList
-                            [ ( "text-blue-400", subtitle == props.currentSubtitle ) ]
-                        , onClick (props.setVideoTime subtitle.time)
-                        , Attr.id (subtitleId subtitle)
-                        ]
-                        [ text subtitle.text ]
-                )
-        )
-
-
-subtitlesContainerId : String
-subtitlesContainerId =
-    "subtitles-container"
-
-
-subtitleId : Subtitle -> String
-subtitleId subtitle =
-    "sub" ++ String.fromFloat subtitle.time
-
-
-type alias JumpToSubtitleProps msg =
-    { subtitle : Subtitle
-    , noop : msg
-    }
-
-
-jumpToSubtitle : JumpToSubtitleProps msg -> Cmd msg
-jumpToSubtitle props =
-    let
-        padding =
-            500
-    in
-    Dom.getViewportOf subtitlesContainerId
-        |> Task.andThen
-            (\{ viewport } ->
-                Dom.getElement (subtitleId props.subtitle)
-                    |> Task.map (\{ element } -> ( viewport, element ))
-            )
-        |> Task.andThen
-            (\( viewport, element ) ->
-                Dom.setViewportOf subtitlesContainerId
-                    0
-                    (viewport.y + element.y - padding)
-            )
-        |> Task.attempt (\_ -> props.noop)
 
 
 

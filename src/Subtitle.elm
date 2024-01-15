@@ -1,8 +1,13 @@
-module Subtitle exposing (Subtitle, at, decoder, fromTranscript, next, prev, timeParser)
+module Subtitle exposing (Subtitle, at, decoder, fromTranscript, jumpTo, next, prev, timeParser, view)
 
+import Browser.Dom as Dom
+import Html exposing (Html, div, text)
+import Html.Attributes as Attr exposing (class, classList)
+import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Parser exposing ((|.), (|=), DeadEnd, Parser, Step(..))
+import Task
 import VideoTime exposing (VideoTime)
 
 
@@ -80,6 +85,66 @@ prev videoTime subtitles =
 
 
 
+-- VIEW
+
+
+type alias ViewSubtitlesProps msg =
+    { currentSubtitle : Subtitle
+    , subtitles : List Subtitle
+    , setVideoTime : Float -> msg
+    }
+
+
+view : ViewSubtitlesProps msg -> Html msg
+view props =
+    div [ Attr.id subtitlesContainerId, class "overflow-y-scroll" ]
+        (props.subtitles
+            |> List.map
+                (\subtitle ->
+                    div
+                        [ class "text-center text-2xl"
+                        , classList
+                            [ ( "text-blue-400", subtitle == props.currentSubtitle ) ]
+                        , onClick (props.setVideoTime subtitle.time)
+                        , Attr.id (subtitleId subtitle)
+                        ]
+                        [ text subtitle.text ]
+                )
+        )
+
+
+
+-- JUMP TO SUBTITLE
+
+
+type alias JumpToSubtitleProps msg =
+    { subtitle : Subtitle
+    , noop : msg
+    }
+
+
+jumpTo : JumpToSubtitleProps msg -> Cmd msg
+jumpTo props =
+    let
+        padding =
+            500
+    in
+    Dom.getViewportOf subtitlesContainerId
+        |> Task.andThen
+            (\{ viewport } ->
+                Dom.getElement (subtitleId props.subtitle)
+                    |> Task.map (\{ element } -> ( viewport, element ))
+            )
+        |> Task.andThen
+            (\( viewport, element ) ->
+                Dom.setViewportOf subtitlesContainerId
+                    0
+                    (viewport.y + element.y - padding)
+            )
+        |> Task.attempt (\_ -> props.noop)
+
+
+
 -- INTERNAL
 
 
@@ -114,3 +179,13 @@ textParser =
         Parser.succeed ()
             |. Parser.spaces
             |. Parser.chompUntilEndOr "\n"
+
+
+subtitlesContainerId : String
+subtitlesContainerId =
+    "subtitles-container"
+
+
+subtitleId : Subtitle -> String
+subtitleId subtitle =
+    "sub" ++ String.fromFloat subtitle.time
