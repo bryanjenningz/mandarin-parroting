@@ -52,7 +52,9 @@ update msg _ =
         LoadDictionary (Ok dictionary) ->
             let
                 simplified =
-                    dictionary |> String.split "\n"
+                    dictionary
+                        |> String.split "\n"
+                        |> List.filter (\line -> not (String.startsWith "#" line))
 
                 traditional =
                     simplified |> List.sortBy toTraditional
