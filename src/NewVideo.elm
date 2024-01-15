@@ -85,6 +85,7 @@ type alias ViewProps msg =
     { setNewVideoId : String -> msg
     , setNewVideoTranscript : String -> msg
     , submitNewVideo : msg
+    , newVideoError : Maybe Error
     }
 
 
@@ -117,4 +118,21 @@ view props =
             , onClick props.submitNewVideo
             ]
             [ text "Add video" ]
+        , case props.newVideoError of
+            Nothing ->
+                text ""
+
+            Just error ->
+                div [ class "text-red-500" ]
+                    [ text <|
+                        case error of
+                            EmptyVideoId ->
+                                "Enter a video ID."
+
+                            EmptyTranscript ->
+                                "Enter a transcript."
+
+                            InvalidTranscript deadEnds ->
+                                Parser.deadEndsToString deadEnds
+                    ]
         ]

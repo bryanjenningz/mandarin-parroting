@@ -243,6 +243,7 @@ viewSelectVideoTab model =
             { setNewVideoId = SetNewVideoId
             , setNewVideoTranscript = SetNewVideoTranscript
             , submitNewVideo = SubmitNewVideo
+            , newVideoError = model.newVideoError
             }
         , div [ class "flex flex-col gap-4" ]
             (List.map (viewVideoCard model) model.videos)
