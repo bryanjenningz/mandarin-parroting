@@ -2,10 +2,11 @@ port module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
+import Flags exposing (Flags)
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
-import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode exposing (Value)
 import NewVideo exposing (NewVideo)
 import Subtitles exposing (Subtitle, Subtitles)
 import Task
@@ -43,7 +44,7 @@ init : Value -> ( Model, Cmd Msg )
 init value =
     let
         flags =
-            decodeFlags value
+            Flags.decode value
     in
     ( { tab = SelectVideoTab
       , videoId = flags.videoId
@@ -56,44 +57,6 @@ init value =
       }
     , Cmd.none
     )
-
-
-
--- FLAGS
-
-
-type alias Flags =
-    { videoId : Maybe VideoId
-    , videoSpeed : Int
-    , videos : List Video
-    }
-
-
-flagsDecoder : Decoder Flags
-flagsDecoder =
-    Decode.map3
-        (\videoId videoSpeed videos ->
-            { videoId = videoId, videoSpeed = videoSpeed, videos = videos }
-        )
-        (Decode.field "videoId" (Decode.maybe Decode.string))
-        (Decode.field "videoSpeed" Decode.int)
-        (Decode.field "videos" (Decode.list Video.decoder))
-
-
-flagsDefault : Flags
-flagsDefault =
-    { videoId = Nothing
-    , videoSpeed = 100
-    , videos = []
-    }
-
-
-decodeFlags : Value -> Flags
-decodeFlags value =
-    value
-        |> Decode.decodeValue Decode.string
-        |> Result.andThen (Decode.decodeString flagsDecoder)
-        |> Result.withDefault flagsDefault
 
 
 
