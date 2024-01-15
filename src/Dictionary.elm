@@ -4,6 +4,7 @@ import Array exposing (Array)
 import Html exposing (Html, article, div, h2, p, text)
 import Html.Attributes exposing (class)
 import Http
+import Parser exposing ((|.), (|=), Parser)
 
 
 
@@ -207,17 +208,27 @@ type alias Line =
 
 parseLine : String -> Maybe Line
 parseLine line =
-    case line |> String.split "\t" of
-        [ simplified, traditional, pinyin, definitions ] ->
-            Just
-                { simplified = simplified
-                , traditional = traditional
-                , pinyin = pinyin
-                , definitions = definitions |> String.split "; "
-                }
+    Parser.run lineParser line
+        |> Result.toMaybe
 
-        _ ->
-            Nothing
+
+lineParser : Parser Line
+lineParser =
+    Parser.succeed
+        (\simplified traditional pinyin definitions ->
+            { simplified = simplified
+            , traditional = traditional
+            , pinyin = pinyin
+            , definitions = definitions |> String.dropRight 1 |> String.split "/"
+            }
+        )
+        |= Parser.getChompedString (Parser.chompUntil " ")
+        |. Parser.symbol " "
+        |= Parser.getChompedString (Parser.chompUntil " ")
+        |. Parser.symbol " ["
+        |= Parser.getChompedString (Parser.chompUntil "]")
+        |. Parser.symbol "] /"
+        |= Parser.getChompedString (Parser.chompUntilEndOr "\n")
 
 
 viewLine : Line -> Html msg
