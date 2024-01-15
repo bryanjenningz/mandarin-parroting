@@ -362,21 +362,32 @@ viewPlayVideoTab model =
                         text ""
 
                     Just subtitle ->
-                        viewSubtitles subtitle video.subtitles
+                        viewSubtitles
+                            { currentSubtitle = subtitle
+                            , subtitles = video.subtitles
+                            , setVideoTime = SetVideoTime
+                            }
                 ]
 
 
-viewSubtitles : Subtitle -> List Subtitle -> Html Msg
-viewSubtitles currentSubtitle subtitles =
+type alias ViewSubtitlesProps msg =
+    { currentSubtitle : Subtitle
+    , subtitles : List Subtitle
+    , setVideoTime : Float -> msg
+    }
+
+
+viewSubtitles : ViewSubtitlesProps msg -> Html msg
+viewSubtitles props =
     div [ Attr.id subtitlesContainerId, class "overflow-y-scroll" ]
-        (subtitles
+        (props.subtitles
             |> List.map
                 (\subtitle ->
                     div
                         [ class "text-center text-2xl"
                         , classList
-                            [ ( "text-blue-400", subtitle == currentSubtitle ) ]
-                        , onClick (SetVideoTime subtitle.time)
+                            [ ( "text-blue-400", subtitle == props.currentSubtitle ) ]
+                        , onClick (props.setVideoTime subtitle.time)
                         , Attr.id (subtitleId subtitle)
                         ]
                         [ text subtitle.text ]
