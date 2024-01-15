@@ -87,17 +87,10 @@ update msg model =
 
         TabClicked tab ->
             ( { model | tab = tab }
-            , case Video.getById model.videoId model.videos of
-                Nothing ->
-                    Cmd.none
-
-                Just video ->
-                    case Subtitle.at model.videoTime video.subtitles of
-                        Nothing ->
-                            Cmd.none
-
-                        Just subtitle ->
-                            Subtitle.jumpTo { subtitle = subtitle, noop = NoOp }
+            , Video.getById model.videoId model.videos
+                |> Maybe.andThen (\video -> Subtitle.at model.videoTime video.subtitles)
+                |> Maybe.map (\subtitle -> Subtitle.jumpTo { subtitle = subtitle, noop = NoOp })
+                |> Maybe.withDefault Cmd.none
             )
 
         StartVideo videoId ->
