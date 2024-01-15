@@ -5,7 +5,6 @@ import Browser.Dom as Dom
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
-import List.Extra as List
 import NewVideo exposing (NewVideo)
 import Subtitles exposing (Subtitle, Subtitles)
 import Task
@@ -108,7 +107,7 @@ update msg model =
             let
                 maybeNextSubtitleTime : Maybe VideoTime
                 maybeNextSubtitleTime =
-                    getVideo model.videoId model.videos
+                    Video.getById model.videoId model.videos
                         |> Maybe.map .subtitles
                         |> Maybe.andThen (Subtitles.next model.videoTime)
                         |> Maybe.map .time
@@ -124,7 +123,7 @@ update msg model =
             let
                 maybePrevSubtitleTime : Maybe VideoTime
                 maybePrevSubtitleTime =
-                    getVideo model.videoId model.videos
+                    Video.getById model.videoId model.videos
                         |> Maybe.map .subtitles
                         |> Maybe.andThen (Subtitles.prev model.videoTime)
                         |> Maybe.map .time
@@ -170,11 +169,6 @@ update msg model =
 
         AddVideo video ->
             ( { model | videos = model.videos ++ [ video ] }, Cmd.none )
-
-
-getVideo : Maybe VideoId -> List Video -> Maybe Video
-getVideo videoId videos =
-    videoId |> Maybe.andThen (\id -> List.find (.videoId >> (==) id) videos)
 
 
 
@@ -262,7 +256,7 @@ viewSelectVideoTab model =
 
 viewPlayVideoTab : Model -> Html Msg
 viewPlayVideoTab model =
-    case getVideo model.videoId model.videos of
+    case Video.getById model.videoId model.videos of
         Nothing ->
             div [ class "flex flex-col items-center" ]
                 [ div [ class "w-full max-w-2xl flex flex-col items-center gap-4" ]

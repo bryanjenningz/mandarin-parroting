@@ -1,8 +1,9 @@
-module Video exposing (Video, VideoId, viewCard, viewControls, viewSlider)
+module Video exposing (Video, VideoId, getById, viewCard, viewControls, viewSlider)
 
 import Html exposing (Attribute, Html, button, div, h2, input, span, text)
 import Html.Attributes as Attr exposing (attribute, class)
 import Html.Events exposing (onClick, onInput)
+import List.Extra as List
 import Subtitles exposing (Subtitles)
 import VideoTime exposing (VideoTime)
 
@@ -17,6 +18,11 @@ type alias Video =
     , duration : VideoTime
     , subtitles : Subtitles
     }
+
+
+getById : Maybe VideoId -> List Video -> Maybe Video
+getById videoId videos =
+    videoId |> Maybe.andThen (\id -> List.find (.videoId >> (==) id) videos)
 
 
 
