@@ -1,4 +1,4 @@
-module Flashcard exposing (Flashcard, decoder, from, member)
+module Flashcard exposing (Flashcard, decoder, equals, from, member)
 
 import Json.Decode as Decode exposing (Decoder)
 
@@ -49,3 +49,8 @@ from props =
 member : { a | traditional : String } -> List Flashcard -> Bool
 member flashcard flashcards =
     List.member flashcard.traditional (List.map .traditional flashcards)
+
+
+equals : Flashcard -> Flashcard -> Bool
+equals a b =
+    a.traditional == b.traditional

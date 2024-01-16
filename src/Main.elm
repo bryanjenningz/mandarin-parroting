@@ -239,7 +239,11 @@ update msg model =
         SaveFlashcard flashcard ->
             let
                 newModel =
-                    { model | flashcards = List.filter ((/=) flashcard) model.flashcards ++ [ flashcard ] }
+                    { model
+                        | flashcards =
+                            List.filter (\card -> not <| Flashcard.equals card flashcard) model.flashcards
+                                ++ [ flashcard ]
+                    }
             in
             ( newModel
             , saveFlags
@@ -253,7 +257,10 @@ update msg model =
         DeleteFlashcard flashcard ->
             let
                 newModel =
-                    { model | flashcards = List.filter ((/=) flashcard) model.flashcards }
+                    { model
+                        | flashcards =
+                            List.filter (\card -> not <| Flashcard.equals card flashcard) model.flashcards
+                    }
             in
             ( newModel
             , saveFlags
