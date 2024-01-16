@@ -445,6 +445,8 @@ viewPlayVideoTab model =
                             , dictionary = model.dictionary
                             , dictionaryLookup = model.dictionaryLookup
                             , setDictionaryLookup = SetDictionaryLookup
+                            , saveFlashcard = SaveFlashcard
+                            , deleteFlashcard = DeleteFlashcard
                             }
                 ]
 

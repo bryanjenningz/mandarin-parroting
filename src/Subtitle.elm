@@ -2,6 +2,7 @@ module Subtitle exposing (Subtitle, at, decoder, fromTranscript, jumpTo, next, p
 
 import Browser.Dom as Dom
 import Dictionary
+import Flashcard exposing (Flashcard)
 import Html exposing (Html, button, div, span, text)
 import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
@@ -96,6 +97,8 @@ type alias ViewSubtitlesProps msg =
     , dictionary : Dictionary.Model
     , dictionaryLookup : Maybe ( Subtitle, Int )
     , setDictionaryLookup : Maybe ( Subtitle, Int ) -> msg
+    , saveFlashcard : Flashcard -> msg
+    , deleteFlashcard : Flashcard -> msg
     }
 
 
