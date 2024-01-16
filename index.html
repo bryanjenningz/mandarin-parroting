@@ -22,6 +22,13 @@
       let player;
       let isPlaying = false;
       let intervalId = null;
+      const savedVideoSpeed = (() => {
+        try {
+          return JSON.parse(localStorage.getItem("flags")).videoSpeed || 100;
+        } catch {
+          return 100;
+        }
+      })();
 
       const app = Elm.Main.init({
         node: document.getElementById("root"),
@@ -75,7 +82,10 @@
       }
 
       function setVideoSpeed(videoSpeed) {
-        player?.setPlaybackRate?.(videoSpeed / 100);
+        if (!player?.setPlaybackRate) {
+          return setTimeout(() => setVideoSpeed(videoSpeed), INTERVAL_TIME);
+        }
+        player.setPlaybackRate(videoSpeed / 100);
       }
 
       function submitNewVideo(data) {
@@ -117,6 +127,7 @@
               playsinline: 1,
             },
           });
+          setVideoSpeed(savedVideoSpeed);
         };
       }
 
