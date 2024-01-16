@@ -1,4 +1,4 @@
-module Flashcard exposing (Flashcard, decoder)
+module Flashcard exposing (Flashcard, decoder, from, member)
 
 import Json.Decode as Decode exposing (Decoder)
 
@@ -28,3 +28,24 @@ decoder =
         (Decode.field "pinyin" Decode.string)
         (Decode.field "definitions" (Decode.list Decode.string))
         (Decode.field "correctReviewsInARow" (Decode.maybe Decode.int))
+
+
+from :
+    { traditional : String
+    , simplified : String
+    , pinyin : String
+    , definitions : List String
+    }
+    -> Flashcard
+from props =
+    { traditional = props.traditional
+    , simplified = props.simplified
+    , pinyin = props.pinyin
+    , definitions = props.definitions
+    , correctReviewsInARow = Nothing
+    }
+
+
+member : { a | traditional : String } -> List Flashcard -> Bool
+member flashcard flashcards =
+    List.member flashcard.traditional (List.map .traditional flashcards)

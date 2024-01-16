@@ -1,8 +1,10 @@
 module Dictionary exposing (Model, Msg, fetch, init, search, update, view)
 
 import Array exposing (Array)
+import Flashcard exposing (Flashcard)
 import Html exposing (Html, article, button, div, h2, p, text)
 import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Http
 import Parser exposing ((|.), (|=), Parser)
 
@@ -94,10 +96,19 @@ search searchText dictionaryData =
 -- VIEW
 
 
-view : String -> Model -> Html msg
-view searchText model =
+type alias ViewProps msg =
+    { searchText : String
+    , dictionary : Model
+    , flashcards : List Flashcard
+    , saveFlashcard : Flashcard -> msg
+    , deleteFlashcard : Flashcard -> msg
+    }
+
+
+view : ViewProps msg -> Html msg
+view props =
     div [ class "bg-black text-white z-10" ]
-        [ case model of
+        [ case props.dictionary of
             EmptyDictionary ->
                 text "Waiting for dictionary to load..."
 
@@ -105,12 +116,17 @@ view searchText model =
                 text "Failed to load dictionary."
 
             Dictionary dictionaryData ->
-                case search searchText dictionaryData of
+                case search props.searchText dictionaryData of
                     Nothing ->
-                        text ("No results for the text \"" ++ searchText ++ "\"")
+                        text ("No results for the text \"" ++ props.searchText ++ "\"")
 
                     Just line ->
-                        viewLine line
+                        viewLine
+                            { line = line
+                            , isFlashcard = Flashcard.member line props.flashcards
+                            , saveFlashcard = props.saveFlashcard
+                            , deleteFlashcard = props.deleteFlashcard
+                            }
         ]
 
 
@@ -232,22 +248,42 @@ lineParser =
         |= Parser.getChompedString (Parser.chompUntilEndOr "\n")
 
 
-viewLine : Line -> Html msg
-viewLine line =
+type alias ViewLineProps msg =
+    { line : Line
+    , isFlashcard : Bool
+    , saveFlashcard : Flashcard -> msg
+    , deleteFlashcard : Flashcard -> msg
+    }
+
+
+viewLine : ViewLineProps msg -> Html msg
+viewLine props =
     article []
         [ div [ class "flex justify-between gap-3" ]
             [ h2 [ class "text-2xl flex gap-3" ]
-                [ div [] [ text line.traditional ]
-                , if line.traditional /= line.simplified then
-                    div [] [ text line.simplified ]
+                [ div [] [ text props.line.traditional ]
+                , if props.line.traditional /= props.line.simplified then
+                    div [] [ text props.line.simplified ]
 
                   else
                     text ""
                 ]
             , button
-                [ class "bg-blue-600 text-white w-6 h-6 rounded-lg flex justify-center items-center text-sm font-bold" ]
-                [ text "+" ]
+                [ class "bg-blue-600 text-white w-6 h-6 rounded-lg flex justify-center items-center text-sm font-bold"
+                , if props.isFlashcard then
+                    onClick (props.deleteFlashcard (Flashcard.from props.line))
+
+                  else
+                    onClick (props.saveFlashcard (Flashcard.from props.line))
+                ]
+                [ text <|
+                    if props.isFlashcard then
+                        "x"
+
+                    else
+                        "+"
+                ]
             ]
-        , div [ class "text-lg" ] [ text line.pinyin ]
-        , p [ class "text-lg" ] [ text (String.join "; " line.definitions) ]
+        , div [ class "text-lg" ] [ text props.line.pinyin ]
+        , p [ class "text-lg" ] [ text (String.join "; " props.line.definitions) ]
         ]

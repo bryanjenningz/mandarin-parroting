@@ -97,6 +97,7 @@ type alias ViewSubtitlesProps msg =
     , dictionary : Dictionary.Model
     , dictionaryLookup : Maybe ( Subtitle, Int )
     , setDictionaryLookup : Maybe ( Subtitle, Int ) -> msg
+    , flashcards : List Flashcard
     , saveFlashcard : Flashcard -> msg
     , deleteFlashcard : Flashcard -> msg
     }
@@ -132,8 +133,13 @@ view props =
                                             [ text char
                                             , if selected then
                                                 div [ class "absolute top-100 min-w-64 z-20 bg-black text-white p-4 rounded-lg border border-white" ]
-                                                    [ Dictionary.view (String.dropLeft i subtitle.text)
-                                                        props.dictionary
+                                                    [ Dictionary.view
+                                                        { searchText = String.dropLeft i subtitle.text
+                                                        , dictionary = props.dictionary
+                                                        , flashcards = props.flashcards
+                                                        , saveFlashcard = props.saveFlashcard
+                                                        , deleteFlashcard = props.deleteFlashcard
+                                                        }
                                                     ]
 
                                               else

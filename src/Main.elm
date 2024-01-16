@@ -239,18 +239,7 @@ update msg model =
         SaveFlashcard flashcard ->
             let
                 newModel =
-                    { model
-                        | flashcards =
-                            List.map
-                                (\card ->
-                                    if card == flashcard then
-                                        flashcard
-
-                                    else
-                                        card
-                                )
-                                model.flashcards
-                    }
+                    { model | flashcards = List.filter ((/=) flashcard) model.flashcards ++ [ flashcard ] }
             in
             ( newModel
             , saveFlags
@@ -264,10 +253,7 @@ update msg model =
         DeleteFlashcard flashcard ->
             let
                 newModel =
-                    { model
-                        | flashcards =
-                            List.filter (\card -> card /= flashcard) model.flashcards
-                    }
+                    { model | flashcards = List.filter ((/=) flashcard) model.flashcards }
             in
             ( newModel
             , saveFlags
@@ -445,6 +431,7 @@ viewPlayVideoTab model =
                             , dictionary = model.dictionary
                             , dictionaryLookup = model.dictionaryLookup
                             , setDictionaryLookup = SetDictionaryLookup
+                            , flashcards = model.flashcards
                             , saveFlashcard = SaveFlashcard
                             , deleteFlashcard = DeleteFlashcard
                             }
