@@ -278,7 +278,7 @@ viewLine props =
                 ]
                 [ text <|
                     if props.isFlashcard then
-                        "x"
+                        "×"
 
                     else
                         "+"
