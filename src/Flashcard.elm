@@ -84,8 +84,8 @@ view props =
                 ]
 
         flashcard :: _ ->
-            div [ class "flex flex-col" ]
-                [ div [ class "grow" ]
+            div [ class "flex flex-col grow" ]
+                [ div [ class "flex justify-center items-center gap-3 text-3xl" ]
                     [ div [] [ text flashcard.traditional ]
                     , if flashcard.traditional /= flashcard.simplified then
                         div [] [ text flashcard.simplified ]
@@ -94,7 +94,7 @@ view props =
                         text ""
                     ]
                 , if props.flashcardBackShown then
-                    div [ class "grow" ]
+                    div [ class "flex flex-col grow" ]
                         [ div [] [ text flashcard.pinyin ]
                         , div [] [ text (String.join "; " flashcard.definitions) ]
                         , div []
@@ -104,8 +104,11 @@ view props =
                         ]
 
                   else
-                    div [ class "grow" ]
-                        [ button [ onClick props.showFlashcardBack ]
+                    div [ class "flex flex-col justify-end grow" ]
+                        [ button
+                            [ onClick props.showFlashcardBack
+                            , class "py-2 px-4 bg-blue-600 text-lg rounded-lg"
+                            ]
                             [ text "Show back" ]
                         ]
                 ]

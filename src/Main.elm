@@ -344,20 +344,18 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "flex flex-col items-center" ]
+    div [ class "flex flex-col items-center min-h-screen" ]
         [ div [ class "fixed w-full" ] [ viewTabs model ]
-        , div [ class "w-full max-w-2xl" ]
-            [ div [ class "pt-20 px-3" ]
-                [ case model.tab of
-                    SelectVideoTab ->
-                        viewSelectVideoTab model
+        , div [ class "w-full max-w-2xl flex flex-col grow pt-20 px-4 pb-4" ]
+            [ case model.tab of
+                SelectVideoTab ->
+                    viewSelectVideoTab model
 
-                    PlayVideoTab ->
-                        viewPlayVideoTab model
+                PlayVideoTab ->
+                    viewPlayVideoTab model
 
-                    ReviewTab ->
-                        viewReviewTab model
-                ]
+                ReviewTab ->
+                    viewReviewTab model
             ]
         ]
 
