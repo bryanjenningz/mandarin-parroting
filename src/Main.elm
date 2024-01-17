@@ -126,12 +126,7 @@ update msg model =
 
                   else
                     startVideo videoId
-                , saveFlags
-                    { videoId = newModel.videoId
-                    , videoSpeed = newModel.videoSpeed
-                    , videos = newModel.videos
-                    , flashcards = newModel.flashcards
-                    }
+                , saveModel newModel
                 ]
             )
 
@@ -190,12 +185,7 @@ update msg model =
             ( newModel
             , Cmd.batch
                 [ setVideoSpeed videoSpeed
-                , saveFlags
-                    { videoId = newModel.videoId
-                    , videoSpeed = newModel.videoSpeed
-                    , videos = newModel.videos
-                    , flashcards = newModel.flashcards
-                    }
+                , saveModel newModel
                 ]
             )
 
@@ -224,14 +214,7 @@ update msg model =
                 newModel =
                     { model | videos = model.videos ++ [ video ] }
             in
-            ( newModel
-            , saveFlags
-                { videoId = newModel.videoId
-                , videoSpeed = newModel.videoSpeed
-                , videos = newModel.videos
-                , flashcards = newModel.flashcards
-                }
-            )
+            ( newModel, saveModel newModel )
 
         DictionaryMsg dictionaryMsg ->
             ( { model | dictionary = Dictionary.update dictionaryMsg model.dictionary }
@@ -250,14 +233,7 @@ update msg model =
                                 ++ [ flashcard ]
                     }
             in
-            ( newModel
-            , saveFlags
-                { videoId = newModel.videoId
-                , videoSpeed = newModel.videoSpeed
-                , videos = newModel.videos
-                , flashcards = newModel.flashcards
-                }
-            )
+            ( newModel, saveModel newModel )
 
         DeleteFlashcard flashcard ->
             let
@@ -267,14 +243,7 @@ update msg model =
                             List.filter (\card -> not <| Flashcard.equals card flashcard) model.flashcards
                     }
             in
-            ( newModel
-            , saveFlags
-                { videoId = newModel.videoId
-                , videoSpeed = newModel.videoSpeed
-                , videos = newModel.videos
-                , flashcards = newModel.flashcards
-                }
-            )
+            ( newModel, saveModel newModel )
 
         ShowFlashcardBack ->
             ( { model | flashcardBackShown = True }, Cmd.none )
@@ -302,14 +271,7 @@ update msg model =
                         , flashcardBackShown = False
                     }
             in
-            ( newModel
-            , saveFlags
-                { videoId = newModel.videoId
-                , videoSpeed = newModel.videoSpeed
-                , videos = newModel.videos
-                , flashcards = newModel.flashcards
-                }
-            )
+            ( newModel, saveModel newModel )
 
         FailFlashcard flashcard ->
             let
@@ -328,14 +290,17 @@ update msg model =
                         , flashcardBackShown = False
                     }
             in
-            ( newModel
-            , saveFlags
-                { videoId = newModel.videoId
-                , videoSpeed = newModel.videoSpeed
-                , videos = newModel.videos
-                , flashcards = newModel.flashcards
-                }
-            )
+            ( newModel, saveModel newModel )
+
+
+saveModel : Model -> Cmd Msg
+saveModel model =
+    saveFlags
+        { videoId = model.videoId
+        , videoSpeed = model.videoSpeed
+        , videos = model.videos
+        , flashcards = model.flashcards
+        }
 
 
 
@@ -531,6 +496,10 @@ subscriptions _ =
         [ getVideoTime GetVideoTime
         , addVideo AddVideo
         ]
+
+
+
+-- PORTS
 
 
 port startVideo : VideoId -> Cmd msg
