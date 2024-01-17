@@ -71,7 +71,7 @@ type alias ViewProps msg =
 
 view : ViewProps msg -> Html msg
 view props =
-    case props.flashcards of
+    case sort props.flashcards of
         [] ->
             div [ class "flex flex-col gap-4" ]
                 [ p [ class "text-center text-xl" ]
@@ -122,3 +122,14 @@ view props =
                             [ text "Show back" ]
                         ]
                 ]
+
+
+
+-- INTERNAL
+
+
+sort : List Flashcard -> List Flashcard
+sort flashcards =
+    List.sortBy
+        (\card -> card.correctReviewsInARow |> Maybe.withDefault 1)
+        flashcards
