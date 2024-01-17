@@ -94,6 +94,7 @@ type Msg
     | ShowFlashcardBack
     | PassFlashcard Flashcard
     | FailFlashcard Flashcard
+    | PlayTextToSpeech String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -292,6 +293,9 @@ update msg model =
             in
             ( newModel, saveModel newModel )
 
+        PlayTextToSpeech textString ->
+            ( model, textToSpeech textString )
+
 
 saveModel : Model -> Cmd Msg
 saveModel model =
@@ -484,6 +488,7 @@ viewReviewTab model =
         , failFlashcard = FailFlashcard
         , deleteFlashcard = DeleteFlashcard
         , goToPlayVideoTab = TabClicked PlayVideoTab
+        , playTextToSpeech = PlayTextToSpeech
         }
 
 
@@ -525,6 +530,9 @@ port submitNewVideo : { videoId : String, subtitles : List Subtitle } -> Cmd msg
 
 
 port addVideo : (Video -> msg) -> Sub msg
+
+
+port textToSpeech : String -> Cmd msg
 
 
 port saveFlags : Flags -> Cmd msg

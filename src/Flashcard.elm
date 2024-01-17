@@ -67,6 +67,7 @@ type alias ViewProps msg =
     , failFlashcard : Flashcard -> msg
     , deleteFlashcard : Flashcard -> msg
     , goToPlayVideoTab : msg
+    , playTextToSpeech : String -> msg
     }
 
 
@@ -81,7 +82,7 @@ view props =
                     [ class "text-lg bg-blue-600 text-white py-2 px-4 w-full rounded-lg"
                     , onClick props.goToPlayVideoTab
                     ]
-                    [ text "Save flashcards " ]
+                    [ text "Save flashcards" ]
                 ]
 
         flashcard :: _ ->
@@ -102,7 +103,9 @@ view props =
                 , if props.flashcardBackShown then
                     div [ class "flex flex-col justify-between items-center grow" ]
                         [ div [ class "flex flex-col gap-4" ]
-                            [ div [ class "text-2xl text-center" ] [ text flashcard.pinyin ]
+                            [ button [ onClick (props.playTextToSpeech flashcard.traditional) ]
+                                [ text "🔊" ]
+                            , div [ class "text-2xl text-center" ] [ text flashcard.pinyin ]
                             , div [ class "text-xl text-center" ] [ text (String.join "; " flashcard.definitions) ]
                             ]
                         , div [ class "w-full flex gap-3 text-lg" ]
