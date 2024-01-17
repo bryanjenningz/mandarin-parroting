@@ -482,6 +482,7 @@ viewReviewTab model =
         , showFlashcardBack = ShowFlashcardBack
         , passFlashcard = PassFlashcard
         , failFlashcard = FailFlashcard
+        , deleteFlashcard = DeleteFlashcard
         , goToPlayVideoTab = TabClicked PlayVideoTab
         }
 

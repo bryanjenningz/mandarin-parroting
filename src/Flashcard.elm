@@ -65,6 +65,7 @@ type alias ViewProps msg =
     , showFlashcardBack : msg
     , passFlashcard : Flashcard -> msg
     , failFlashcard : Flashcard -> msg
+    , deleteFlashcard : Flashcard -> msg
     , goToPlayVideoTab : msg
     }
 
@@ -85,13 +86,18 @@ view props =
 
         flashcard :: _ ->
             div [ class "flex flex-col grow" ]
-                [ div [ class "flex justify-center items-center gap-3 text-3xl" ]
+                [ div [ class "relative flex justify-center items-center gap-3 text-3xl" ]
                     [ div [] [ text flashcard.traditional ]
                     , if flashcard.traditional /= flashcard.simplified then
                         div [] [ text flashcard.simplified ]
 
                       else
                         text ""
+                    , button
+                        [ onClick (props.deleteFlashcard flashcard)
+                        , class "absolute top-0 right-0 w-8 h-8 flex justify-center items-center text-4xl"
+                        ]
+                        [ text "×" ]
                     ]
                 , if props.flashcardBackShown then
                     div [ class "flex flex-col justify-between items-center grow" ]
