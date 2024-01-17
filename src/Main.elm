@@ -40,6 +40,7 @@ type alias Model =
     , dictionary : Dictionary.Model
     , dictionaryLookup : Maybe ( Subtitle, Int )
     , flashcards : List Flashcard
+    , flashcardBackShown : Bool
     }
 
 
@@ -60,6 +61,7 @@ init value =
       , dictionary = Dictionary.init
       , dictionaryLookup = Nothing
       , flashcards = flags.flashcards
+      , flashcardBackShown = False
       }
     , Dictionary.fetch DictionaryMsg
     )
@@ -89,6 +91,9 @@ type Msg
     | SetDictionaryLookup (Maybe ( Subtitle, Int ))
     | SaveFlashcard Flashcard
     | DeleteFlashcard Flashcard
+    | ShowFlashcardBack
+    | PassFlashcard Flashcard
+    | FailFlashcard Flashcard
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -260,6 +265,67 @@ update msg model =
                     { model
                         | flashcards =
                             List.filter (\card -> not <| Flashcard.equals card flashcard) model.flashcards
+                    }
+            in
+            ( newModel
+            , saveFlags
+                { videoId = newModel.videoId
+                , videoSpeed = newModel.videoSpeed
+                , videos = newModel.videos
+                , flashcards = newModel.flashcards
+                }
+            )
+
+        ShowFlashcardBack ->
+            ( { model | flashcardBackShown = True }, Cmd.none )
+
+        PassFlashcard flashcard ->
+            let
+                newModel =
+                    { model
+                        | flashcards =
+                            List.map
+                                (\card ->
+                                    if Flashcard.equals card flashcard then
+                                        { card
+                                            | correctReviewsInARow =
+                                                card.correctReviewsInARow
+                                                    |> Maybe.withDefault 0
+                                                    |> (+) 1
+                                                    |> Just
+                                        }
+
+                                    else
+                                        card
+                                )
+                                model.flashcards
+                        , flashcardBackShown = False
+                    }
+            in
+            ( newModel
+            , saveFlags
+                { videoId = newModel.videoId
+                , videoSpeed = newModel.videoSpeed
+                , videos = newModel.videos
+                , flashcards = newModel.flashcards
+                }
+            )
+
+        FailFlashcard flashcard ->
+            let
+                newModel =
+                    { model
+                        | flashcards =
+                            List.map
+                                (\card ->
+                                    if Flashcard.equals card flashcard then
+                                        { card | correctReviewsInARow = Just 0 }
+
+                                    else
+                                        card
+                                )
+                                model.flashcards
+                        , flashcardBackShown = False
                     }
             in
             ( newModel
