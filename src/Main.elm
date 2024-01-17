@@ -103,7 +103,7 @@ update msg model =
             ( model, Cmd.none )
 
         TabClicked tab ->
-            ( { model | tab = tab }
+            ( { model | tab = tab, flashcardBackShown = False }
             , Video.getById model.videoId model.videos
                 |> Maybe.andThen (\video -> Subtitle.at model.videoTime video.subtitles)
                 |> Maybe.map (\subtitle -> Subtitle.jumpTo { subtitle = subtitle, noop = NoOp })
