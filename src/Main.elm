@@ -513,38 +513,14 @@ viewPlayVideoTab model =
 
 viewReviewTab : Model -> Html Msg
 viewReviewTab model =
-    div []
-        (case model.flashcards of
-            [] ->
-                [ div [ class "flex flex-col gap-4" ]
-                    [ div [ class "text-center text-xl" ]
-                        [ text "You haven't saved any flashcards." ]
-                    , button
-                        [ class "text-lg bg-blue-600 text-white py-2 px-4 w-full rounded-lg"
-                        , onClick (TabClicked PlayVideoTab)
-                        ]
-                        [ text "Save flashcards " ]
-                    ]
-                ]
-
-            _ ->
-                List.map
-                    (\flashcard ->
-                        div [ class "p-4 flex flex-col gap-3" ]
-                            [ div [ class "flex gap-3" ]
-                                [ div [] [ text flashcard.traditional ]
-                                , if flashcard.simplified /= flashcard.traditional then
-                                    div [] [ text flashcard.simplified ]
-
-                                  else
-                                    text ""
-                                ]
-                            , div [] [ text flashcard.pinyin ]
-                            , div [] [ text (String.join "; " flashcard.definitions) ]
-                            ]
-                    )
-                    model.flashcards
-        )
+    Flashcard.view
+        { flashcardBackShown = model.flashcardBackShown
+        , flashcards = model.flashcards
+        , showFlashcardBack = ShowFlashcardBack
+        , passFlashcard = PassFlashcard
+        , failFlashcard = FailFlashcard
+        , goToPlayVideoTab = TabClicked PlayVideoTab
+        }
 
 
 
