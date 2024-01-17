@@ -91,7 +91,7 @@ type Msg
     | SetDictionaryLookup (Maybe ( Subtitle, Int ))
     | SaveFlashcard Flashcard
     | DeleteFlashcard Flashcard
-    | ShowFlashcardBack
+    | ShowFlashcardBack Flashcard
     | PassFlashcard Flashcard
     | FailFlashcard Flashcard
     | PlayTextToSpeech String
@@ -246,8 +246,8 @@ update msg model =
             in
             ( newModel, saveModel newModel )
 
-        ShowFlashcardBack ->
-            ( { model | flashcardBackShown = True }, Cmd.none )
+        ShowFlashcardBack flashcard ->
+            ( { model | flashcardBackShown = True }, textToSpeech flashcard.traditional )
 
         PassFlashcard flashcard ->
             let

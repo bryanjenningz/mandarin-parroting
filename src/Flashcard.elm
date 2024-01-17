@@ -62,7 +62,7 @@ equals a b =
 type alias ViewProps msg =
     { flashcardBackShown : Bool
     , flashcards : List Flashcard
-    , showFlashcardBack : msg
+    , showFlashcardBack : Flashcard -> msg
     , passFlashcard : Flashcard -> msg
     , failFlashcard : Flashcard -> msg
     , deleteFlashcard : Flashcard -> msg
@@ -125,7 +125,7 @@ view props =
                   else
                     div [ class "flex flex-col justify-end grow" ]
                         [ button
-                            [ onClick props.showFlashcardBack
+                            [ onClick (props.showFlashcardBack flashcard)
                             , class "py-2 px-4 bg-blue-600 text-lg rounded-lg uppercase"
                             ]
                             [ text "Show back" ]
