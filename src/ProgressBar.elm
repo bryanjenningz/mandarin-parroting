@@ -1,7 +1,8 @@
-module ProgressBar exposing (ProgressBar, incrementSavedFlashcardsToday, resetFlashcardsSavedToday, setNow, view)
+module ProgressBar exposing (ProgressBar, decoder, incrementSavedFlashcardsToday, setNow, view)
 
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
+import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Time
 
@@ -14,6 +15,19 @@ type alias ProgressBarData =
     { now : Time.Posix
     , savedFlashcardsToday : Int
     }
+
+
+decoder : Decoder ProgressBar
+decoder =
+    Decode.map2
+        (\now savedFlashcardsToday ->
+            ProgressBar
+                { now = Time.millisToPosix now
+                , savedFlashcardsToday = savedFlashcardsToday
+                }
+        )
+        (Decode.field "now" Decode.int)
+        (Decode.field "savedFlashcardsToday" Decode.int)
 
 
 setNow : Time.Posix -> ProgressBar -> ProgressBar
@@ -50,7 +64,7 @@ view (ProgressBar data) =
 
 type alias Date =
     { year : Int
-    , month : Int
+    , month : Time.Month
     , day : Int
     }
 
