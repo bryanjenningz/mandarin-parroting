@@ -340,7 +340,7 @@ view model =
         , div [ class "w-full max-w-2xl flex flex-col grow pt-20 px-4 pb-4" ]
             [ case model.tab of
                 VideosTab ->
-                    viewSelectVideoTab model
+                    viewVideosTab model
 
                 PracticeTab ->
                     viewPracticeTab model
@@ -394,8 +394,8 @@ viewTab model tab =
         ]
 
 
-viewSelectVideoTab : Model -> Html Msg
-viewSelectVideoTab model =
+viewVideosTab : Model -> Html Msg
+viewVideosTab model =
     div [ class "flex flex-col items-center gap-4" ]
         [ NewVideo.view
             { setNewVideoId = SetNewVideoId
