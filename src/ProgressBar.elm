@@ -20,6 +20,7 @@ type alias ProgressBarData =
     { now : Time.Posix
     , flashcardsSaved : Int
     , flashcardsReviewed : Int
+    , secondsListened : Int
     }
 
 
@@ -29,6 +30,7 @@ init =
         { now = Time.millisToPosix 0
         , flashcardsSaved = 0
         , flashcardsReviewed = 0
+        , secondsListened = 0
         }
 
 
@@ -38,17 +40,19 @@ init =
 
 decoder : Decoder ProgressBar
 decoder =
-    Decode.map3
-        (\now flashcardsSaved flashcardsReviewed ->
+    Decode.map4
+        (\now flashcardsSaved flashcardsReviewed secondsListened ->
             ProgressBar
                 { now = Time.millisToPosix now
                 , flashcardsSaved = flashcardsSaved
                 , flashcardsReviewed = flashcardsReviewed
+                , secondsListened = secondsListened
                 }
         )
         (Decode.field "now" Decode.int)
         (Decode.field "flashcardsSaved" Decode.int)
         (Decode.field "flashcardsReviewed" Decode.int)
+        (Decode.field "secondsListened" Decode.int)
 
 
 encoder : ProgressBar -> Encode.Value
@@ -57,6 +61,7 @@ encoder (ProgressBar data) =
         [ ( "now", Encode.int (Time.posixToMillis data.now) )
         , ( "flashcardsSaved", Encode.int data.flashcardsSaved )
         , ( "flashcardsReviewed", Encode.int data.flashcardsReviewed )
+        , ( "secondsListened", Encode.int data.secondsListened )
         ]
 
 
@@ -81,6 +86,7 @@ incrementFlashcardsReviewed (ProgressBar data) =
 type ProgressBarMode
     = FlashcardsSavedMode
     | FlashcardsReviewedMode
+    | TimeListenedMode
 
 
 view : ProgressBarMode -> ProgressBar -> Html msg
@@ -108,6 +114,21 @@ view mode (ProgressBar data) =
                             ++ " / "
                             ++ String.fromInt (flashcardGoal data.flashcardsReviewed)
                             ++ " flashcards reviewed"
+                    }
+
+                TimeListenedMode ->
+                    let
+                        minutesListened =
+                            data.secondsListened // 60
+                    in
+                    { width =
+                        percent minutesListened
+                            (flashcardGoal minutesListened)
+                    , textLabel =
+                        String.fromInt minutesListened
+                            ++ " / "
+                            ++ String.fromInt (flashcardGoal minutesListened)
+                            ++ " minutes listened"
                     }
     in
     div [ class "relative w-full bg-slate-500 rounded-full h-4 overflow-hidden" ]
@@ -172,8 +193,10 @@ setNow now (ProgressBar data) =
         ProgressBar { data | now = now }
 
     else
+        -- Reset the progress bar stats on each new day
         ProgressBar
             { now = now
             , flashcardsSaved = 0
             , flashcardsReviewed = 0
+            , secondsListened = 0
             }
