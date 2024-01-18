@@ -84,6 +84,7 @@ view (ProgressBar data) =
                 String.fromInt data.savedFlashcardsToday
                     ++ " / "
                     ++ String.fromInt (flashcardGoal data.savedFlashcardsToday)
+                    ++ " flashcards created"
             ]
         ]
 
