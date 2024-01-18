@@ -1,8 +1,9 @@
-module ProgressBar exposing (ProgressBar, decoder, incrementSavedFlashcardsToday, setNow, view)
+module ProgressBar exposing (ProgressBar, decoder, encoder, incrementSavedFlashcardsToday, setNow, view)
 
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
 import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode
 import List.Extra as List
 import Time
 
@@ -28,6 +29,14 @@ decoder =
         )
         (Decode.field "now" Decode.int)
         (Decode.field "savedFlashcardsToday" Decode.int)
+
+
+encoder : ProgressBar -> Encode.Value
+encoder (ProgressBar data) =
+    Encode.object
+        [ ( "now", Encode.int (Time.posixToMillis data.now) )
+        , ( "savedFlashcardsToday", Encode.int data.savedFlashcardsToday )
+        ]
 
 
 setNow : Time.Posix -> ProgressBar -> ProgressBar
