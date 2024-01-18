@@ -444,9 +444,11 @@ viewPlayVideoTab model =
                     Subtitle.at model.videoTime video.subtitles
             in
             div [ class "flex flex-col items-center gap-2 h-[80vh]" ]
-                [ div [ class "text-xl text-center" ] [ text video.title ]
+                [ div [ class "relative w-full" ]
+                    [ ProgressBar.view ProgressBar.TimeListenedMode model.progressBar ]
                 , div [ class "relative w-full" ]
                     [ ProgressBar.view ProgressBar.FlashcardsSavedMode model.progressBar ]
+                , div [ class "text-xl text-center" ] [ text video.title ]
                 , Video.viewSlider
                     { videoTime = model.videoTime
                     , setVideoTime = SetVideoTime
