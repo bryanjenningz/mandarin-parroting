@@ -1,4 +1,4 @@
-module ProgressBar exposing (ProgressBar, decoder, encoder, incrementSavedFlashcardsToday, init, setNow, subscriptions, view)
+module ProgressBar exposing (ProgressBar, decoder, encoder, incrementSavedFlashcardsToday, init, subscriptions, view)
 
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
@@ -6,6 +6,10 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import List.Extra as List
 import Time
+
+
+
+-- MODEL
 
 
 type ProgressBar
@@ -24,6 +28,10 @@ init =
         { now = Time.millisToPosix 0
         , savedFlashcardsToday = 0
         }
+
+
+
+-- ENCODING / DECODING
 
 
 decoder : Decoder ProgressBar
@@ -47,18 +55,17 @@ encoder (ProgressBar data) =
         ]
 
 
-setNow : Time.Posix -> ProgressBar -> ProgressBar
-setNow now (ProgressBar data) =
-    if toDate now == toDate data.now then
-        ProgressBar { data | now = now }
 
-    else
-        ProgressBar { data | now = now, savedFlashcardsToday = 0 }
+-- HELPERS
 
 
 incrementSavedFlashcardsToday : ProgressBar -> ProgressBar
 incrementSavedFlashcardsToday (ProgressBar data) =
     ProgressBar { data | savedFlashcardsToday = data.savedFlashcardsToday + 1 }
+
+
+
+-- VIEW
 
 
 view : ProgressBar -> Html msg
@@ -75,9 +82,13 @@ view (ProgressBar data) =
         ]
 
 
+
+-- SUBSCRIPTIONS
+
+
 subscriptions : (ProgressBar -> msg) -> ProgressBar -> Sub msg
-subscriptions toMsg (ProgressBar data) =
-    Time.every (60 * 1000) (\now -> ProgressBar { data | now = now } |> toMsg)
+subscriptions toMsg progressBar =
+    Time.every (60 * 1000) (\now -> setNow now progressBar |> toMsg)
 
 
 
@@ -114,3 +125,12 @@ flashcardGoal flashcardsSavedToday =
 percent : Int -> Int -> String
 percent numerator denominator =
     String.fromInt (numerator * 100 // denominator) ++ "%"
+
+
+setNow : Time.Posix -> ProgressBar -> ProgressBar
+setNow now (ProgressBar data) =
+    if toDate now == toDate data.now then
+        ProgressBar { data | now = now }
+
+    else
+        ProgressBar { data | now = now, savedFlashcardsToday = 0 }
