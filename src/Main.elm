@@ -523,6 +523,7 @@ subscriptions model =
         , ProgressBar.subscriptions
             { setProgressBar = SetProgressBar
             , progressBar = model.progressBar
+            , videoIsPlaying = model.videoIsPlaying
             }
         ]
 

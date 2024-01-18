@@ -149,17 +149,30 @@ view mode (ProgressBar data) =
 type alias SubscriptionsProps msg =
     { setProgressBar : ProgressBar -> msg
     , progressBar : ProgressBar
+    , videoIsPlaying : Bool
     }
 
 
 subscriptions : SubscriptionsProps msg -> Sub msg
 subscriptions props =
-    Time.every (60 * 1000)
-        (\now ->
-            props.progressBar
-                |> setNow now
-                |> props.setProgressBar
-        )
+    Sub.batch
+        [ Time.every (60 * 1000)
+            (\now ->
+                props.progressBar
+                    |> setNow now
+                    |> props.setProgressBar
+            )
+        , if props.videoIsPlaying then
+            Time.every 1000
+                (\_ ->
+                    props.progressBar
+                        |> incrementSecondsListened
+                        |> props.setProgressBar
+                )
+
+          else
+            Sub.none
+        ]
 
 
 
@@ -211,3 +224,8 @@ setNow now (ProgressBar data) =
             , flashcardsReviewed = 0
             , secondsListened = 0
             }
+
+
+incrementSecondsListened : ProgressBar -> ProgressBar
+incrementSecondsListened (ProgressBar data) =
+    ProgressBar { data | secondsListened = data.secondsListened + 1 }
