@@ -445,12 +445,14 @@ viewPlayVideoTab model =
             in
             div [ class "flex flex-col items-center gap-2 h-[80vh]" ]
                 [ div [ class "text-xl text-center" ] [ text video.title ]
+                , div [ class "relative w-full" ]
+                    [ ProgressBar.view ProgressBar.FlashcardsSavedMode model.progressBar ]
                 , Video.viewSlider
                     { videoTime = model.videoTime
                     , setVideoTime = SetVideoTime
                     }
                     video
-                , div []
+                , div [ class "text-xs" ]
                     [ text
                         (VideoTime.toString model.videoTime
                             ++ " / "
