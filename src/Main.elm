@@ -121,7 +121,7 @@ update msg model =
             let
                 newModel =
                     { model
-                        | tab = PlayVideoTab
+                        | tab = PracticeTab
                         , videoId = Just videoId
                         , videoIsPlaying = True
                     }
@@ -342,7 +342,7 @@ view model =
                 VideosTab ->
                     viewSelectVideoTab model
 
-                PlayVideoTab ->
+                PracticeTab ->
                     viewPlayVideoTab model
 
                 ReviewTab ->
@@ -353,14 +353,14 @@ view model =
 
 type Tab
     = VideosTab
-    | PlayVideoTab
+    | PracticeTab
     | ReviewTab
 
 
 tabs : List Tab
 tabs =
     [ VideosTab
-    , PlayVideoTab
+    , PracticeTab
     , ReviewTab
     ]
 
@@ -386,7 +386,7 @@ viewTab model tab =
                 VideosTab ->
                     "Videos"
 
-                PlayVideoTab ->
+                PracticeTab ->
                     "Practice"
 
                 ReviewTab ->
@@ -513,7 +513,7 @@ viewReviewTab model =
         , passFlashcard = PassFlashcard
         , failFlashcard = FailFlashcard
         , deleteFlashcard = DeleteFlashcard
-        , goToPlayVideoTab = TabClicked PlayVideoTab
+        , goToPlayVideoTab = TabClicked PracticeTab
         , playTextToSpeech = PlayTextToSpeech
         , progressBar = model.progressBar
         }
