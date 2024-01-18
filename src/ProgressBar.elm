@@ -1,4 +1,4 @@
-module ProgressBar exposing (ProgressBar, incrementSavedFlashcardsToday, resetFlashcardsSavedToday, setHereNow, view)
+module ProgressBar exposing (ProgressBar, incrementSavedFlashcardsToday, resetFlashcardsSavedToday, setNow, view)
 
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
@@ -11,15 +11,14 @@ type ProgressBar
 
 
 type alias ProgressBarData =
-    { here : Time.Zone
-    , now : Time.Posix
+    { now : Time.Posix
     , savedFlashcardsToday : Int
     }
 
 
-setHereNow : { here : Time.Zone, now : Time.Posix } -> ProgressBar -> ProgressBar
-setHereNow { here, now } (ProgressBar data) =
-    ProgressBar { data | here = here, now = now }
+setNow : Time.Posix -> ProgressBar -> ProgressBar
+setNow now (ProgressBar data) =
+    ProgressBar { data | now = now }
 
 
 incrementSavedFlashcardsToday : ProgressBar -> ProgressBar
