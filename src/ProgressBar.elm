@@ -146,9 +146,20 @@ view mode (ProgressBar data) =
 -- SUBSCRIPTIONS
 
 
-subscriptions : (ProgressBar -> msg) -> ProgressBar -> Sub msg
-subscriptions toMsg progressBar =
-    Time.every (60 * 1000) (\now -> setNow now progressBar |> toMsg)
+type alias SubscriptionsProps msg =
+    { setProgressBar : ProgressBar -> msg
+    , progressBar : ProgressBar
+    }
+
+
+subscriptions : SubscriptionsProps msg -> Sub msg
+subscriptions props =
+    Time.every (60 * 1000)
+        (\now ->
+            props.progressBar
+                |> setNow now
+                |> props.setProgressBar
+        )
 
 
 

@@ -520,7 +520,10 @@ subscriptions model =
     Sub.batch
         [ getVideoTime GetVideoTime
         , addVideo AddVideo
-        , ProgressBar.subscriptions SetProgressBar model.progressBar
+        , ProgressBar.subscriptions
+            { setProgressBar = SetProgressBar
+            , progressBar = model.progressBar
+            }
         ]
 
 
