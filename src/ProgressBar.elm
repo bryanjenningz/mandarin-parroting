@@ -72,12 +72,14 @@ view : ProgressBar -> Html msg
 view (ProgressBar data) =
     div [ class "relative w-full bg-slate-500 rounded-full h-4 overflow-hidden" ]
         [ div
-            [ class "absolute left-0 top-0 bottom-0 bg-blue-600 text-xs flex justify-center items-center"
+            [ class "absolute left-0 top-0 bottom-0 bg-blue-600"
             , style "width"
                 (percent data.savedFlashcardsToday
                     (flashcardGoal data.savedFlashcardsToday)
                 )
             ]
+            []
+        , div [ class "absolute inset-0 flex justify-center items-center text-xs" ]
             [ text <|
                 String.fromInt data.savedFlashcardsToday
                     ++ " / "
