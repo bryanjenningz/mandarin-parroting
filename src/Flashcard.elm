@@ -105,7 +105,7 @@ view props =
 
         flashcard :: _ ->
             div [ class "flex flex-col grow" ]
-                [ ProgressBar.view ProgressBar.FlashcardsCreatedMode props.progressBar
+                [ ProgressBar.view ProgressBar.FlashcardsSavedMode props.progressBar
                 , div [ class "relative flex justify-center items-center gap-3 text-3xl" ]
                     [ div [] [ text flashcard.traditional ]
                     , if flashcard.traditional /= flashcard.simplified then

@@ -79,7 +79,7 @@ incrementFlashcardsReviewed (ProgressBar data) =
 
 
 type ProgressBarMode
-    = FlashcardsCreatedMode
+    = FlashcardsSavedMode
     | FlashcardsReviewedMode
 
 
@@ -88,7 +88,7 @@ view mode (ProgressBar data) =
     let
         { width, textLabel } =
             case mode of
-                FlashcardsCreatedMode ->
+                FlashcardsSavedMode ->
                     { width =
                         percent data.flashcardsSaved
                             (flashcardGoal data.flashcardsSaved)
