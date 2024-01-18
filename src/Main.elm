@@ -248,6 +248,7 @@ update msg model =
                     { model
                         | flashcards =
                             List.filter (\card -> not <| Flashcard.equals card flashcard) model.flashcards
+                        , flashcardBackShown = False
                     }
             in
             ( newModel, saveModel newModel )
