@@ -96,7 +96,7 @@ view mode (ProgressBar data) =
                         String.fromInt data.flashcardsSaved
                             ++ " / "
                             ++ String.fromInt (flashcardGoal data.flashcardsSaved)
-                            ++ " flashcards created"
+                            ++ " flashcards saved"
                     }
 
                 FlashcardsReviewedMode ->
