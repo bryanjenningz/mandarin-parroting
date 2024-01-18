@@ -83,7 +83,7 @@ type alias ViewProps msg =
     , passFlashcard : Flashcard -> msg
     , failFlashcard : Flashcard -> msg
     , deleteFlashcard : Flashcard -> msg
-    , goToPlayVideoTab : msg
+    , goToPracticeTab : msg
     , playTextToSpeech : String -> msg
     , progressBar : ProgressBar
     }
@@ -98,7 +98,7 @@ view props =
                     [ text "You haven't saved any flashcards." ]
                 , button
                     [ class "text-lg bg-blue-600 text-white py-2 px-4 w-full rounded-lg"
-                    , onClick props.goToPlayVideoTab
+                    , onClick props.goToPracticeTab
                     ]
                     [ text "Save flashcards" ]
                 ]

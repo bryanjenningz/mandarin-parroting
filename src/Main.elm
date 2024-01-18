@@ -343,7 +343,7 @@ view model =
                     viewSelectVideoTab model
 
                 PracticeTab ->
-                    viewPlayVideoTab model
+                    viewPracticeTab model
 
                 ReviewTab ->
                     viewReviewTab model
@@ -418,8 +418,8 @@ viewSelectVideoTab model =
         ]
 
 
-viewPlayVideoTab : Model -> Html Msg
-viewPlayVideoTab model =
+viewPracticeTab : Model -> Html Msg
+viewPracticeTab model =
     case Video.getById model.videoId model.videos of
         Nothing ->
             div [ class "flex flex-col items-center" ]
@@ -513,7 +513,7 @@ viewReviewTab model =
         , passFlashcard = PassFlashcard
         , failFlashcard = FailFlashcard
         , deleteFlashcard = DeleteFlashcard
-        , goToPlayVideoTab = TabClicked PracticeTab
+        , goToPracticeTab = TabClicked PracticeTab
         , playTextToSpeech = PlayTextToSpeech
         , progressBar = model.progressBar
         }
