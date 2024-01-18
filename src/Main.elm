@@ -53,7 +53,7 @@ init value =
         flags =
             Flags.decode value
     in
-    ( { tab = SelectVideoTab
+    ( { tab = VideosTab
       , videoId = flags.videoId
       , videoIsPlaying = False
       , videoTime = 0
@@ -339,7 +339,7 @@ view model =
         [ div [ class "fixed w-full" ] [ viewTabs model ]
         , div [ class "w-full max-w-2xl flex flex-col grow pt-20 px-4 pb-4" ]
             [ case model.tab of
-                SelectVideoTab ->
+                VideosTab ->
                     viewSelectVideoTab model
 
                 PlayVideoTab ->
@@ -352,14 +352,14 @@ view model =
 
 
 type Tab
-    = SelectVideoTab
+    = VideosTab
     | PlayVideoTab
     | ReviewTab
 
 
 tabs : List Tab
 tabs =
-    [ SelectVideoTab
+    [ VideosTab
     , PlayVideoTab
     , ReviewTab
     ]
@@ -383,7 +383,7 @@ viewTab model tab =
         ]
         [ text <|
             case tab of
-                SelectVideoTab ->
+                VideosTab ->
                     "Videos"
 
                 PlayVideoTab ->
@@ -433,7 +433,7 @@ viewPlayVideoTab model =
                                 "You haven't selected a video to practice."
                         ]
                     , button
-                        [ onClick (TabClicked SelectVideoTab)
+                        [ onClick (TabClicked VideosTab)
                         , class "w-full py-2 px-4 bg-blue-600 rounded-lg"
                         ]
                         [ text <|
