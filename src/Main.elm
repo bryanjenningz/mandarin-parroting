@@ -237,7 +237,7 @@ update msg model =
                         | flashcards =
                             List.filter (\card -> not <| Flashcard.equals card flashcard) model.flashcards
                                 ++ [ flashcard ]
-                        , progressBar = ProgressBar.incrementSavedFlashcardsToday model.progressBar
+                        , progressBar = ProgressBar.incrementFlashcardsSaved model.progressBar
                     }
             in
             ( newModel, saveModel newModel )

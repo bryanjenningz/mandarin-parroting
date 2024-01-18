@@ -1,4 +1,4 @@
-module ProgressBar exposing (ProgressBar, ProgressBarMode(..), decoder, encoder, incrementSavedFlashcardsToday, init, subscriptions, view)
+module ProgressBar exposing (ProgressBar, ProgressBarMode(..), decoder, encoder, incrementFlashcardsSaved, init, subscriptions, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
@@ -18,7 +18,7 @@ type ProgressBar
 
 type alias ProgressBarData =
     { now : Time.Posix
-    , savedFlashcardsToday : Int
+    , flashcardsSaved : Int
     , flashcardsReviewed : Int
     }
 
@@ -27,7 +27,7 @@ init : ProgressBar
 init =
     ProgressBar
         { now = Time.millisToPosix 0
-        , savedFlashcardsToday = 0
+        , flashcardsSaved = 0
         , flashcardsReviewed = 0
         }
 
@@ -39,15 +39,15 @@ init =
 decoder : Decoder ProgressBar
 decoder =
     Decode.map3
-        (\now savedFlashcardsToday flashcardsReviewed ->
+        (\now flashcardsSaved flashcardsReviewed ->
             ProgressBar
                 { now = Time.millisToPosix now
-                , savedFlashcardsToday = savedFlashcardsToday
+                , flashcardsSaved = flashcardsSaved
                 , flashcardsReviewed = flashcardsReviewed
                 }
         )
         (Decode.field "now" Decode.int)
-        (Decode.field "savedFlashcardsToday" Decode.int)
+        (Decode.field "flashcardsSaved" Decode.int)
         (Decode.field "flashcardsReviewed" Decode.int)
 
 
@@ -55,7 +55,7 @@ encoder : ProgressBar -> Encode.Value
 encoder (ProgressBar data) =
     Encode.object
         [ ( "now", Encode.int (Time.posixToMillis data.now) )
-        , ( "savedFlashcardsToday", Encode.int data.savedFlashcardsToday )
+        , ( "flashcardsSaved", Encode.int data.flashcardsSaved )
         , ( "flashcardsReviewed", Encode.int data.flashcardsReviewed )
         ]
 
@@ -64,9 +64,9 @@ encoder (ProgressBar data) =
 -- HELPERS
 
 
-incrementSavedFlashcardsToday : ProgressBar -> ProgressBar
-incrementSavedFlashcardsToday (ProgressBar data) =
-    ProgressBar { data | savedFlashcardsToday = data.savedFlashcardsToday + 1 }
+incrementFlashcardsSaved : ProgressBar -> ProgressBar
+incrementFlashcardsSaved (ProgressBar data) =
+    ProgressBar { data | flashcardsSaved = data.flashcardsSaved + 1 }
 
 
 
@@ -85,12 +85,12 @@ view mode (ProgressBar data) =
             case mode of
                 FlashcardsCreatedMode ->
                     { width =
-                        percent data.savedFlashcardsToday
-                            (flashcardGoal data.savedFlashcardsToday)
+                        percent data.flashcardsSaved
+                            (flashcardGoal data.flashcardsSaved)
                     , textLabel =
-                        String.fromInt data.savedFlashcardsToday
+                        String.fromInt data.flashcardsSaved
                             ++ " / "
-                            ++ String.fromInt (flashcardGoal data.savedFlashcardsToday)
+                            ++ String.fromInt (flashcardGoal data.flashcardsSaved)
                             ++ " flashcards created"
                     }
 
@@ -99,9 +99,9 @@ view mode (ProgressBar data) =
                         percent data.flashcardsReviewed
                             (flashcardGoal data.flashcardsReviewed)
                     , textLabel =
-                        String.fromInt data.savedFlashcardsToday
+                        String.fromInt data.flashcardsSaved
                             ++ " / "
-                            ++ String.fromInt (flashcardGoal data.savedFlashcardsToday)
+                            ++ String.fromInt (flashcardGoal data.flashcardsSaved)
                             ++ " flashcards created"
                     }
     in
@@ -169,6 +169,6 @@ setNow now (ProgressBar data) =
     else
         ProgressBar
             { now = now
-            , savedFlashcardsToday = 0
+            , flashcardsSaved = 0
             , flashcardsReviewed = 0
             }
