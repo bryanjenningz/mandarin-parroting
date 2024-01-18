@@ -1,9 +1,10 @@
-module Video exposing (Video, VideoId, decoder, getById, viewCard, viewControls, viewSlider)
+module Video exposing (Video, VideoId, decoder, encoder, getById, viewCard, viewControls, viewSlider)
 
 import Html exposing (Attribute, Html, button, div, h2, input, span, text)
 import Html.Attributes as Attr exposing (attribute, class)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode
 import List.Extra as List
 import Subtitle exposing (Subtitle)
 import VideoTime exposing (VideoTime)
@@ -35,6 +36,16 @@ decoder =
         (Decode.field "title" Decode.string)
         (Decode.field "duration" Decode.float)
         (Decode.field "subtitles" (Decode.list Subtitle.decoder))
+
+
+encoder : Video -> Encode.Value
+encoder video =
+    Encode.object
+        [ ( "videoId", Encode.string video.videoId )
+        , ( "title", Encode.string video.title )
+        , ( "duration", Encode.float video.duration )
+        , ( "subtitles", Encode.list Subtitle.encoder video.subtitles )
+        ]
 
 
 getById : Maybe VideoId -> List Video -> Maybe Video

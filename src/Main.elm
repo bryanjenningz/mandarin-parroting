@@ -2,19 +2,21 @@ port module Main exposing (main)
 
 import Browser
 import Dictionary
-import Flags exposing (Flags)
+import Flags
 import Flashcard exposing (Flashcard)
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
-import Json.Decode exposing (Value)
+import Json.Decode as Decode
+import Json.Encode as Encode
 import NewVideo exposing (NewVideo)
+import ProgressBar exposing (ProgressBar)
 import Subtitle exposing (Subtitle)
 import Video exposing (Video, VideoId)
 import VideoTime exposing (VideoTime)
 
 
-main : Program Value Model Msg
+main : Program Decode.Value Model Msg
 main =
     Browser.element
         { init = init
@@ -41,10 +43,11 @@ type alias Model =
     , dictionaryLookup : Maybe ( Subtitle, Int )
     , flashcards : List Flashcard
     , flashcardBackShown : Bool
+    , progressBar : ProgressBar
     }
 
 
-init : Value -> ( Model, Cmd Msg )
+init : Decode.Value -> ( Model, Cmd Msg )
 init value =
     let
         flags =
@@ -62,6 +65,7 @@ init value =
       , dictionaryLookup = Nothing
       , flashcards = flags.flashcards
       , flashcardBackShown = False
+      , progressBar = flags.progressBar
       }
     , Dictionary.fetch DictionaryMsg
     )
@@ -95,6 +99,7 @@ type Msg
     | PassFlashcard Flashcard
     | FailFlashcard Flashcard
     | PlayTextToSpeech String
+    | SetProgressBar ProgressBar
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -296,15 +301,20 @@ update msg model =
         PlayTextToSpeech textString ->
             ( model, textToSpeech textString )
 
+        SetProgressBar progressBar ->
+            ( { model | progressBar = progressBar }, Cmd.none )
+
 
 saveModel : Model -> Cmd Msg
 saveModel model =
-    saveFlags
-        { videoId = model.videoId
-        , videoSpeed = model.videoSpeed
-        , videos = model.videos
-        , flashcards = model.flashcards
-        }
+    { videoId = model.videoId
+    , videoSpeed = model.videoSpeed
+    , videos = model.videos
+    , flashcards = model.flashcards
+    , progressBar = model.progressBar
+    }
+        |> Flags.encode
+        |> saveFlags
 
 
 
@@ -497,10 +507,11 @@ viewReviewTab model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     Sub.batch
         [ getVideoTime GetVideoTime
         , addVideo AddVideo
+        , ProgressBar.subscriptions SetProgressBar model.progressBar
         ]
 
 
@@ -535,4 +546,4 @@ port addVideo : (Video -> msg) -> Sub msg
 port textToSpeech : String -> Cmd msg
 
 
-port saveFlags : Flags -> Cmd msg
+port saveFlags : Encode.Value -> Cmd msg

@@ -1,4 +1,4 @@
-module Subtitle exposing (Subtitle, at, decoder, fromTranscript, jumpTo, next, prev, timeParser, view)
+module Subtitle exposing (Subtitle, at, decoder, encoder, fromTranscript, jumpTo, next, prev, timeParser, view)
 
 import Browser.Dom as Dom
 import Dictionary
@@ -7,6 +7,7 @@ import Html exposing (Html, button, div, span, text)
 import Html.Attributes as Attr exposing (class, classList)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode
 import List.Extra as List
 import Parser exposing ((|.), (|=), DeadEnd, Parser, Step(..))
 import Task
@@ -24,6 +25,14 @@ decoder =
     Decode.map2 (\time text -> { time = time, text = text })
         (Decode.field "time" Decode.float)
         (Decode.field "text" Decode.string)
+
+
+encoder : Subtitle -> Encode.Value
+encoder subtitle =
+    Encode.object
+        [ ( "time", Encode.float subtitle.time )
+        , ( "text", Encode.string subtitle.text )
+        ]
 
 
 

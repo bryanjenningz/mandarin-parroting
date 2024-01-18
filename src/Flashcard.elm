@@ -1,9 +1,10 @@
-module Flashcard exposing (Flashcard, decoder, equals, from, member, view)
+module Flashcard exposing (Flashcard, decoder, encoder, equals, from, member, view)
 
 import Html exposing (Html, button, div, p, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode
 
 
 type alias Flashcard =
@@ -31,6 +32,21 @@ decoder =
         (Decode.field "pinyin" Decode.string)
         (Decode.field "definitions" (Decode.list Decode.string))
         (Decode.field "correctReviewsInARow" (Decode.maybe Decode.int))
+
+
+encoder : Flashcard -> Encode.Value
+encoder flashcard =
+    Encode.object
+        [ ( "traditional", Encode.string flashcard.traditional )
+        , ( "simplified", Encode.string flashcard.simplified )
+        , ( "pinyin", Encode.string flashcard.pinyin )
+        , ( "definitions", Encode.list Encode.string flashcard.definitions )
+        , ( "correctReviewsInARow"
+          , flashcard.correctReviewsInARow
+                |> Maybe.map Encode.int
+                |> Maybe.withDefault Encode.null
+          )
+        ]
 
 
 from :

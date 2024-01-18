@@ -1,4 +1,4 @@
-module ProgressBar exposing (ProgressBar, decoder, encoder, incrementSavedFlashcardsToday, setNow, view)
+module ProgressBar exposing (ProgressBar, decoder, encoder, incrementSavedFlashcardsToday, init, setNow, subscriptions, view)
 
 import Html exposing (Html, div)
 import Html.Attributes exposing (class, style)
@@ -16,6 +16,14 @@ type alias ProgressBarData =
     { now : Time.Posix
     , savedFlashcardsToday : Int
     }
+
+
+init : ProgressBar
+init =
+    ProgressBar
+        { now = Time.millisToPosix 0
+        , savedFlashcardsToday = 0
+        }
 
 
 decoder : Decoder ProgressBar
@@ -65,6 +73,11 @@ view (ProgressBar data) =
             ]
             []
         ]
+
+
+subscriptions : (ProgressBar -> msg) -> ProgressBar -> Sub msg
+subscriptions toMsg (ProgressBar data) =
+    Time.every (60 * 1000) (\now -> ProgressBar { data | now = now } |> toMsg)
 
 
 
