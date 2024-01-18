@@ -5,6 +5,7 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
+import ProgressBar exposing (ProgressBar)
 
 
 type alias Flashcard =
@@ -84,6 +85,7 @@ type alias ViewProps msg =
     , deleteFlashcard : Flashcard -> msg
     , goToPlayVideoTab : msg
     , playTextToSpeech : String -> msg
+    , progressBar : ProgressBar
     }
 
 
@@ -103,7 +105,8 @@ view props =
 
         flashcard :: _ ->
             div [ class "flex flex-col grow" ]
-                [ div [ class "relative flex justify-center items-center gap-3 text-3xl" ]
+                [ ProgressBar.view props.progressBar
+                , div [ class "relative flex justify-center items-center gap-3 text-3xl" ]
                     [ div [] [ text flashcard.traditional ]
                     , if flashcard.traditional /= flashcard.simplified then
                         div [] [ text flashcard.simplified ]

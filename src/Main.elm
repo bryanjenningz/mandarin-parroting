@@ -500,6 +500,7 @@ viewReviewTab model =
         , deleteFlashcard = DeleteFlashcard
         , goToPlayVideoTab = TabClicked PlayVideoTab
         , playTextToSpeech = PlayTextToSpeech
+        , progressBar = model.progressBar
         }
 
 
