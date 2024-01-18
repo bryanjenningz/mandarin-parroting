@@ -1,4 +1,4 @@
-module Dictionary exposing (Model, Msg, fetch, init, search, update, view)
+module Dictionary exposing (Model, Msg, fetch, init, update, view)
 
 import Array exposing (Array)
 import Flashcard exposing (Flashcard)
