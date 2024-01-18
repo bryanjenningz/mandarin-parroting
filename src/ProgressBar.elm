@@ -1,4 +1,4 @@
-module ProgressBar exposing (ProgressBar, decoder, encoder, incrementSavedFlashcardsToday, init, subscriptions, view)
+module ProgressBar exposing (ProgressBar, ProgressBarMode(..), decoder, encoder, incrementSavedFlashcardsToday, init, subscriptions, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
@@ -68,24 +68,34 @@ incrementSavedFlashcardsToday (ProgressBar data) =
 -- VIEW
 
 
-view : ProgressBar -> Html msg
-view (ProgressBar data) =
+type ProgressBarMode
+    = FlashcardsCreatedMode
+
+
+view : ProgressBarMode -> ProgressBar -> Html msg
+view mode (ProgressBar data) =
+    let
+        { width, textLabel } =
+            case mode of
+                FlashcardsCreatedMode ->
+                    { width =
+                        percent data.savedFlashcardsToday
+                            (flashcardGoal data.savedFlashcardsToday)
+                    , textLabel =
+                        String.fromInt data.savedFlashcardsToday
+                            ++ " / "
+                            ++ String.fromInt (flashcardGoal data.savedFlashcardsToday)
+                            ++ " flashcards created"
+                    }
+    in
     div [ class "relative w-full bg-slate-500 rounded-full h-4 overflow-hidden" ]
         [ div
             [ class "absolute left-0 top-0 bottom-0 bg-blue-600"
-            , style "width"
-                (percent data.savedFlashcardsToday
-                    (flashcardGoal data.savedFlashcardsToday)
-                )
+            , style "width" width
             ]
             []
         , div [ class "absolute inset-0 flex justify-center items-center text-xs" ]
-            [ text <|
-                String.fromInt data.savedFlashcardsToday
-                    ++ " / "
-                    ++ String.fromInt (flashcardGoal data.savedFlashcardsToday)
-                    ++ " flashcards created"
-            ]
+            [ text textLabel ]
         ]
 
 
