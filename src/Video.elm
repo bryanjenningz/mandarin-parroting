@@ -105,27 +105,36 @@ type alias ViewCardProps msg =
     , startVideo : String -> msg
     , playVideo : msg
     , pauseVideo : msg
+    , video : Video
+    , deleteVideo : msg
     }
 
 
-viewCard : ViewCardProps msg -> Video -> Html msg
-viewCard props video =
+viewCard : ViewCardProps msg -> Html msg
+viewCard props =
     div [ class "px-5 py-5 border border-white rounded-lg mx-auto w-full" ]
         [ div [ class "flex flex-col gap-4" ]
-            [ h2 [ class "text-xl" ] [ text video.title ]
+            [ h2 [ class "text-xl" ] [ text props.video.title ]
             , div [ class "flex justify-between" ]
                 [ button
-                    [ onClick (props.startVideo video.videoId)
+                    [ onClick (props.startVideo props.video.videoId)
                     , class "py-2 px-4 bg-blue-600 rounded-lg"
                     ]
                     [ text "Practice" ]
-                , if props.videoId == Just video.videoId then
-                    playButton
-                        { videoIsPlaying = props.videoIsPlaying
-                        , playVideo = props.playVideo
-                        , pauseVideo = props.pauseVideo
-                        }
-                        [ class "bg-blue-600 rounded-lg w-12 h-12" ]
+                , if props.videoId == Just props.video.videoId then
+                    div [ class "flex gap-2" ]
+                        [ button
+                            [ class "bg-red-600 rounded-lg w-12 h-12 text-lg font-bold"
+                            , onClick props.deleteVideo
+                            ]
+                            [ labeledSymbol "Delete" "×" ]
+                        , playButton
+                            { videoIsPlaying = props.videoIsPlaying
+                            , playVideo = props.playVideo
+                            , pauseVideo = props.pauseVideo
+                            }
+                            [ class "bg-blue-600 rounded-lg w-12 h-12" ]
+                        ]
 
                   else
                     text ""

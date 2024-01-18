@@ -405,13 +405,16 @@ viewVideosTab model =
             }
         , div [ class "flex flex-col gap-4" ]
             (List.map
-                (Video.viewCard
-                    { pauseVideo = PauseVideo
-                    , playVideo = PlayVideo
-                    , startVideo = StartVideo
-                    , videoId = model.videoId
-                    , videoIsPlaying = model.videoIsPlaying
-                    }
+                (\video ->
+                    Video.viewCard
+                        { pauseVideo = PauseVideo
+                        , playVideo = PlayVideo
+                        , startVideo = StartVideo
+                        , videoId = model.videoId
+                        , videoIsPlaying = model.videoIsPlaying
+                        , video = video
+                        , deleteVideo = DeleteVideo video
+                        }
                 )
                 model.videos
             )
