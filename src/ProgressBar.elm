@@ -104,10 +104,10 @@ view mode (ProgressBar data) =
                         percent data.flashcardsReviewed
                             (flashcardGoal data.flashcardsReviewed)
                     , textLabel =
-                        String.fromInt data.flashcardsSaved
+                        String.fromInt data.flashcardsReviewed
                             ++ " / "
-                            ++ String.fromInt (flashcardGoal data.flashcardsSaved)
-                            ++ " flashcards created"
+                            ++ String.fromInt (flashcardGoal data.flashcardsReviewed)
+                            ++ " flashcards reviewed"
                     }
     in
     div [ class "relative w-full bg-slate-500 rounded-full h-4 overflow-hidden" ]
@@ -151,7 +151,7 @@ toDate posix =
 
 flashcardGoals : List Int
 flashcardGoals =
-    [ 1, 5, 10, 15, 20, 25, 50, 100, 200, 500, 1000 ]
+    [ 1, 5, 10, 25, 50, 100, 200, 500, 1000 ]
 
 
 flashcardGoal : Int -> Int
