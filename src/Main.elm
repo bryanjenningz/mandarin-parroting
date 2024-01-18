@@ -91,6 +91,7 @@ type Msg
     | SetNewVideoTranscript String
     | SubmitNewVideo
     | AddVideo Video
+    | DeleteVideo Video
     | DictionaryMsg Dictionary.Msg
     | SetDictionaryLookup (Maybe ( Subtitle, Int ))
     | SaveFlashcard Flashcard
@@ -219,6 +220,13 @@ update msg model =
             let
                 newModel =
                     { model | videos = model.videos ++ [ video ] }
+            in
+            ( newModel, saveModel newModel )
+
+        DeleteVideo video ->
+            let
+                newModel =
+                    { model | videos = List.filter (\x -> x.videoId /= video.videoId) model.videos }
             in
             ( newModel, saveModel newModel )
 
