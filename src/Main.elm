@@ -276,6 +276,7 @@ update msg model =
                                 )
                                 model.flashcards
                         , flashcardBackShown = False
+                        , progressBar = ProgressBar.incrementFlashcardsReviewed model.progressBar
                     }
             in
             ( newModel, saveModel newModel )
@@ -295,6 +296,7 @@ update msg model =
                                 )
                                 model.flashcards
                         , flashcardBackShown = False
+                        , progressBar = ProgressBar.incrementFlashcardsReviewed model.progressBar
                     }
             in
             ( newModel, saveModel newModel )

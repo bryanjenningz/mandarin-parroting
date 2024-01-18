@@ -1,4 +1,4 @@
-module ProgressBar exposing (ProgressBar, ProgressBarMode(..), decoder, encoder, incrementFlashcardsSaved, init, subscriptions, view)
+module ProgressBar exposing (ProgressBar, ProgressBarMode(..), decoder, encoder, incrementFlashcardsReviewed, incrementFlashcardsSaved, init, subscriptions, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
@@ -67,6 +67,11 @@ encoder (ProgressBar data) =
 incrementFlashcardsSaved : ProgressBar -> ProgressBar
 incrementFlashcardsSaved (ProgressBar data) =
     ProgressBar { data | flashcardsSaved = data.flashcardsSaved + 1 }
+
+
+incrementFlashcardsReviewed : ProgressBar -> ProgressBar
+incrementFlashcardsReviewed (ProgressBar data) =
+    ProgressBar { data | flashcardsReviewed = data.flashcardsReviewed + 1 }
 
 
 
