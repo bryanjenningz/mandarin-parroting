@@ -18,17 +18,16 @@ type alias ProgressBarData =
 
 setNow : Time.Posix -> ProgressBar -> ProgressBar
 setNow now (ProgressBar data) =
-    ProgressBar { data | now = now }
+    if toDate now == toDate data.now then
+        ProgressBar { data | now = now }
+
+    else
+        ProgressBar { data | now = now, savedFlashcardsToday = 0 }
 
 
 incrementSavedFlashcardsToday : ProgressBar -> ProgressBar
 incrementSavedFlashcardsToday (ProgressBar data) =
     ProgressBar { data | savedFlashcardsToday = data.savedFlashcardsToday + 1 }
-
-
-resetFlashcardsSavedToday : ProgressBar -> ProgressBar
-resetFlashcardsSavedToday (ProgressBar data) =
-    ProgressBar { data | savedFlashcardsToday = 0 }
 
 
 view : ProgressBar -> Html msg
@@ -47,6 +46,21 @@ view (ProgressBar data) =
 
 
 -- INTERNAL
+
+
+type alias Date =
+    { year : Int
+    , month : Int
+    , day : Int
+    }
+
+
+toDate : Time.Posix -> Date
+toDate posix =
+    { year = Time.toYear Time.utc posix
+    , month = Time.toMonth Time.utc posix
+    , day = Time.toDay Time.utc posix
+    }
 
 
 flashcardGoals : List Int
