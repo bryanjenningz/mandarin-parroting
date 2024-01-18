@@ -19,6 +19,7 @@ type ProgressBar
 type alias ProgressBarData =
     { now : Time.Posix
     , savedFlashcardsToday : Int
+    , flashcardsReviewed : Int
     }
 
 
@@ -27,6 +28,7 @@ init =
     ProgressBar
         { now = Time.millisToPosix 0
         , savedFlashcardsToday = 0
+        , flashcardsReviewed = 0
         }
 
 
@@ -36,15 +38,17 @@ init =
 
 decoder : Decoder ProgressBar
 decoder =
-    Decode.map2
-        (\now savedFlashcardsToday ->
+    Decode.map3
+        (\now savedFlashcardsToday flashcardsReviewed ->
             ProgressBar
                 { now = Time.millisToPosix now
                 , savedFlashcardsToday = savedFlashcardsToday
+                , flashcardsReviewed = flashcardsReviewed
                 }
         )
         (Decode.field "now" Decode.int)
         (Decode.field "savedFlashcardsToday" Decode.int)
+        (Decode.field "flashcardsReviewed" Decode.int)
 
 
 encoder : ProgressBar -> Encode.Value
@@ -52,6 +56,7 @@ encoder (ProgressBar data) =
     Encode.object
         [ ( "now", Encode.int (Time.posixToMillis data.now) )
         , ( "savedFlashcardsToday", Encode.int data.savedFlashcardsToday )
+        , ( "flashcardsReviewed", Encode.int data.flashcardsReviewed )
         ]
 
 
@@ -70,6 +75,7 @@ incrementSavedFlashcardsToday (ProgressBar data) =
 
 type ProgressBarMode
     = FlashcardsCreatedMode
+    | FlashcardsReviewedMode
 
 
 view : ProgressBarMode -> ProgressBar -> Html msg
@@ -81,6 +87,17 @@ view mode (ProgressBar data) =
                     { width =
                         percent data.savedFlashcardsToday
                             (flashcardGoal data.savedFlashcardsToday)
+                    , textLabel =
+                        String.fromInt data.savedFlashcardsToday
+                            ++ " / "
+                            ++ String.fromInt (flashcardGoal data.savedFlashcardsToday)
+                            ++ " flashcards created"
+                    }
+
+                FlashcardsReviewedMode ->
+                    { width =
+                        percent data.flashcardsReviewed
+                            (flashcardGoal data.flashcardsReviewed)
                     , textLabel =
                         String.fromInt data.savedFlashcardsToday
                             ++ " / "
@@ -150,4 +167,8 @@ setNow now (ProgressBar data) =
         ProgressBar { data | now = now }
 
     else
-        ProgressBar { data | now = now, savedFlashcardsToday = 0 }
+        ProgressBar
+            { now = now
+            , savedFlashcardsToday = 0
+            , flashcardsReviewed = 0
+            }
