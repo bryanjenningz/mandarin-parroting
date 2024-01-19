@@ -403,7 +403,7 @@ viewVideosTab model =
             , submitNewVideo = SubmitNewVideo
             , newVideoError = model.newVideoError
             }
-        , div [ class "flex flex-col gap-4" ]
+        , div [ class "flex flex-col gap-4 w-full" ]
             (List.map
                 (\video ->
                     Video.viewCard
