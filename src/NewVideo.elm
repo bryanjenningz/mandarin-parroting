@@ -1,9 +1,11 @@
 module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
 
 import ExampleData
-import Html exposing (Html, a, article, button, div, h2, input, label, text, textarea)
-import Html.Attributes exposing (class, for, href, id, rel, target)
-import Html.Events exposing (onClick, onInput)
+import File exposing (File)
+import Html exposing (Html, a, article, button, div, h2, input, label, text)
+import Html.Attributes exposing (class, for, href, id, rel, target, type_)
+import Html.Events exposing (on, onClick, onInput)
+import Json.Decode as Decode exposing (Decoder)
 import Parser exposing (DeadEnd)
 import Subtitle exposing (Subtitle)
 import Video exposing (VideoId)
@@ -83,7 +85,7 @@ encode (ValidNewVideo newVideo) =
 
 type alias ViewProps msg =
     { setNewVideoId : String -> msg
-    , setNewVideoTranscript : String -> msg
+    , setNewVideoTranscriptFile : File -> msg
     , submitNewVideo : msg
     , newVideoError : Maybe Error
     }
@@ -113,10 +115,11 @@ view props =
         , div [ class "flex flex-col" ]
             [ label [ class "text-xs", for "new-video-transcript-textarea" ]
                 [ text "New video transcript" ]
-            , textarea
+            , input
                 [ id "new-video-transcript-textarea"
                 , class "bg-slate-700 p-2 rounded-lg resize-y"
-                , onInput props.setNewVideoTranscript
+                , type_ "file"
+                , on "change" (Decode.map props.setNewVideoTranscriptFile fileDecoder)
                 ]
                 []
             ]
@@ -143,3 +146,8 @@ view props =
                                 Parser.deadEndsToString deadEnds
                     ]
         ]
+
+
+fileDecoder : Decoder File
+fileDecoder =
+    Decode.at [ "target", "files", "0" ] File.decoder

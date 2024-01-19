@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import Dictionary
+import File exposing (File)
 import Flags
 import Flashcard exposing (Flashcard)
 import Html exposing (Html, button, div, h2, text)
@@ -12,6 +13,7 @@ import Json.Encode as Encode
 import NewVideo exposing (NewVideo)
 import ProgressBar exposing (ProgressBar)
 import Subtitle exposing (Subtitle)
+import Task
 import Video exposing (Video, VideoId)
 import VideoTime exposing (VideoTime)
 
@@ -88,6 +90,7 @@ type Msg
     | JumpToSubtitle Subtitle
     | SetVideoSpeed Int
     | SetNewVideoId VideoId
+    | SetNewVideoTranscriptFile File
     | SetNewVideoTranscript String
     | SubmitNewVideo
     | AddVideo Video
@@ -200,6 +203,9 @@ update msg model =
             ( { model | newVideo = NewVideo.setVideoId newVideoId model.newVideo }
             , Cmd.none
             )
+
+        SetNewVideoTranscriptFile file ->
+            ( model, Task.perform SetNewVideoTranscript (File.toString file) )
 
         SetNewVideoTranscript newVideoTranscript ->
             ( { model | newVideo = NewVideo.setTranscript newVideoTranscript model.newVideo }
@@ -399,7 +405,7 @@ viewVideosTab model =
     div [ class "flex flex-col items-center gap-4" ]
         [ NewVideo.view
             { setNewVideoId = SetNewVideoId
-            , setNewVideoTranscript = SetNewVideoTranscript
+            , setNewVideoTranscriptFile = SetNewVideoTranscriptFile
             , submitNewVideo = SubmitNewVideo
             , newVideoError = model.newVideoError
             }
