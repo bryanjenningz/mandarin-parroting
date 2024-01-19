@@ -1,8 +1,8 @@
 module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
 
 import ExampleData
-import Html exposing (Html, article, button, div, h2, input, label, text, textarea)
-import Html.Attributes exposing (class, for, id)
+import Html exposing (Html, a, article, button, div, h2, input, label, text, textarea)
+import Html.Attributes exposing (class, for, href, id, rel, target)
 import Html.Events exposing (onClick, onInput)
 import Parser exposing (DeadEnd)
 import Subtitle exposing (Subtitle)
@@ -92,7 +92,14 @@ type alias ViewProps msg =
 view : ViewProps msg -> Html msg
 view props =
     article [ class "w-full max-w-2xl flex flex-col gap-4" ]
-        [ h2 [ class "text-2xl" ] [ text "Add a new video" ]
+        [ a
+            [ href "https://docs.invidious.io/instances/"
+            , target "_blank"
+            , rel "noopener noreferrer"
+            , class "bg-blue-600 rounded-lg py-2 px-4 text-center"
+            ]
+            [ text "Find videos on Invidious" ]
+        , h2 [ class "text-2xl" ] [ text "Add a new video" ]
         , div [ class "flex flex-col" ]
             [ label [ class "text-xs", for "new-video-id-input" ]
                 [ text "New video ID" ]
