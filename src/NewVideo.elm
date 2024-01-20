@@ -113,11 +113,11 @@ view props =
                 []
             ]
         , div [ class "flex flex-col" ]
-            [ label [ class "text-xs", for "new-video-transcript-textarea" ]
+            [ label [ class "text-xs", for "new-video-transcript-file" ]
                 [ text "New video transcript" ]
             , input
-                [ id "new-video-transcript-textarea"
-                , class "bg-slate-700 p-2 rounded-lg resize-y"
+                [ id "new-video-transcript-file"
+                , class "bg-slate-700 p-2 rounded-lg"
                 , type_ "file"
                 , on "change" (Decode.map props.setNewVideoTranscriptFile fileDecoder)
                 ]
