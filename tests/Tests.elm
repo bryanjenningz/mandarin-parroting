@@ -138,4 +138,16 @@ Language: zh-Hans
                             , { text = "民进党坚持民主价值和中国偏好的", time = 70400 }
                             ]
                         )
+        , test "Returns 1 subtitle around the 3 minute mark for a transcript with 1 subtitle" <|
+            \_ ->
+                Subtitle.fromTranscript """WEBVTT
+Kind: captions
+Language: zh-TW
+
+00:02:56.832 --> 00:03:03.232
+现场有25万人参加规模非常大
+
+"""
+                    |> Expect.equal
+                        (Ok [ { text = "现场有25万人参加规模非常大", time = 176832 } ])
         ]
