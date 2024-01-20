@@ -1,4 +1,4 @@
-module Tests exposing (..)
+module SubtitleTests exposing (..)
 
 import Expect
 import Subtitle
