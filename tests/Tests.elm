@@ -111,4 +111,31 @@ Language: zh
                             , { text = "在此之前", time = 3400 }
                             ]
                         )
+        , test "Returns 4 subtitles around the 1 minute mark for a transcript with 4 subtitles" <|
+            \_ ->
+                Subtitle.fromTranscript """WEBVTT
+Kind: captions
+Language: zh-Hans
+
+00:00:56.832 --> 00:01:03.232
+现场有25万人参加规模非常大
+
+00:01:03.232 --> 00:01:07.072
+赖清德在晚会上说全世界都在关注
+
+00:01:07.072 --> 00:01:10.400
+台湾人民会做出怎样的选择
+
+00:01:10.400 --> 00:01:14.496
+民进党坚持民主价值和中国偏好的
+
+"""
+                    |> Expect.equal
+                        (Ok
+                            [ { text = "现场有25万人参加规模非常大", time = 56832 }
+                            , { text = "赖清德在晚会上说全世界都在关注", time = 63232 }
+                            , { text = "台湾人民会做出怎样的选择", time = 67072 }
+                            , { text = "民进党坚持民主价值和中国偏好的", time = 70400 }
+                            ]
+                        )
         ]
