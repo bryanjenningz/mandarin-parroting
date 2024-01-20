@@ -150,4 +150,21 @@ Language: zh-TW
 """
                     |> Expect.equal
                         (Ok [ { text = "现场有25万人参加规模非常大", time = 176832 } ])
+        , test "Returns 1 subtitle around the 2 hour and 3 minute mark for a transcript with 1 subtitle" <|
+            \_ ->
+                Subtitle.fromTranscript """WEBVTT
+Kind: captions
+Language: zh-TW
+
+02:02:56.832 --> 02:03:03.232
+现场有25万人参加规模非常大
+
+"""
+                    |> Expect.equal
+                        (Ok
+                            [ { text = "现场有25万人参加规模非常大"
+                              , time = 2 * 60 * 60 * 1000 + 2 * 60 * 1000 + 56832
+                              }
+                            ]
+                        )
         ]
