@@ -1,6 +1,7 @@
 module SubtitleTests exposing (..)
 
 import Expect
+import Parser exposing (Problem(..))
 import Subtitle
 import Test exposing (Test, describe, test)
 
@@ -167,4 +168,18 @@ Language: zh-TW
                               }
                             ]
                         )
+        , test "Returns an error for badly formatted transcript" <|
+            \_ ->
+                Subtitle.fromTranscript """WEBVTT
+Kind: captions
+Language: zh-TW
+
+02:02:56.832 --> 02:03:03.232
+现场有25万人参加规模非常大
+
+aaaa
+
+"""
+                    |> Expect.equal
+                        (Err [ { col = 1, problem = ExpectingEnd, row = 8 } ])
         ]
