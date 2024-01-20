@@ -1,4 +1,4 @@
-module Subtitle exposing (Subtitle, at, decoder, encoder, fromTranscript, jumpTo, next, prev, timeParser, view)
+module Subtitle exposing (Subtitle, at, decoder, encoder, fromTranscript, jumpTo, next, prev, view)
 
 import Browser.Dom as Dom
 import Dictionary
@@ -42,24 +42,6 @@ encoder subtitle =
 fromTranscript : String -> Result (List DeadEnd) (List Subtitle)
 fromTranscript transcript =
     Parser.run subtitlesParser transcript
-
-
-timeParser : Parser Int
-timeParser =
-    Parser.succeed (\minutes seconds -> minutes * 60 + seconds)
-        |. Parser.spaces
-        |= Parser.oneOf
-            [ Parser.succeed identity
-                |. Parser.symbol "0"
-                |= Parser.oneOf
-                    [ Parser.int
-                    , Parser.succeed 0
-                    ]
-            , Parser.int
-            ]
-        |. Parser.symbol ":"
-        |. Parser.oneOf [ Parser.symbol "0", Parser.succeed () ]
-        |= Parser.int
 
 
 
@@ -215,35 +197,96 @@ jumpTo props =
 
 subtitlesParser : Parser (List Subtitle)
 subtitlesParser =
-    Parser.loop [] subtitlesParserHelper
+    Parser.succeed identity
+        |. Parser.token "WEBVTT"
+        |. Parser.spaces
+        |. Parser.token "Kind: captions"
+        |. Parser.spaces
+        |. Parser.oneOf
+            [ Parser.token "Language: zh-Hans"
+            , Parser.token "Language: zh-TW"
+            , Parser.token "Language: zh"
+            ]
+        |. Parser.spaces
+        |= Parser.loop [] subtitlesParserHelper
+        |. Parser.spaces
+        |. Parser.end
 
 
 subtitlesParserHelper : List Subtitle -> Parser (Step (List Subtitle) (List Subtitle))
 subtitlesParserHelper revSubtitles =
     Parser.oneOf
-        [ Parser.succeed (\subtitle -> Loop (subtitle :: revSubtitles))
-            |= subtitleParser
-        , Parser.succeed ()
-            |> Parser.map (\_ -> Done (List.reverse revSubtitles))
+        [ subtitleParser
+            |> Parser.map (\subtitle -> Loop (subtitle :: revSubtitles))
+        , Parser.succeed (Done (List.reverse revSubtitles))
         ]
 
 
 subtitleParser : Parser Subtitle
 subtitleParser =
     Parser.succeed (\time text -> { time = toFloat time, text = text })
-        |. Parser.spaces
         |= timeParser
+        |. Parser.spaces
+        |. Parser.symbol "-->"
+        |. Parser.spaces
+        |. timeParser
         |. Parser.spaces
         |= textParser
         |. Parser.spaces
 
 
+timeParser : Parser Int
+timeParser =
+    Parser.succeed
+        (\hours minutes seconds milliseconds ->
+            (hours * 60 * 60 * 1000)
+                + (minutes * 60 * 1000)
+                + (seconds * 1000)
+                + milliseconds
+        )
+        |= timeSegmentParser
+        |. Parser.symbol ":"
+        |= timeSegmentParser
+        |. Parser.symbol ":"
+        |= timeSegmentParser
+        |. Parser.symbol "."
+        |= timeSegmentMillisecondsParser
+
+
+timeSegmentParser : Parser Int
+timeSegmentParser =
+    Parser.succeed (\first second -> first * 10 + second)
+        |= digitParser
+        |= digitParser
+
+
+timeSegmentMillisecondsParser : Parser Int
+timeSegmentMillisecondsParser =
+    Parser.succeed
+        (\first second third -> first * 100 + second * 10 + third)
+        |= digitParser
+        |= digitParser
+        |= digitParser
+
+
+digitParser : Parser Int
+digitParser =
+    Parser.getChompedString (Parser.chompIf Char.isDigit)
+        |> Parser.andThen
+            (\ch ->
+                case String.toInt ch of
+                    Nothing ->
+                        Parser.problem "Expected a digit"
+
+                    Just digit ->
+                        Parser.succeed digit
+            )
+
+
 textParser : Parser String
 textParser =
-    Parser.getChompedString <|
-        Parser.succeed ()
-            |. Parser.spaces
-            |. Parser.chompUntilEndOr "\n"
+    Parser.succeed identity
+        |= Parser.getChompedString (Parser.chompWhile (\ch -> ch /= '\n'))
 
 
 subtitlesContainerId : String
