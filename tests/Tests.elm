@@ -87,7 +87,7 @@ Language: zh-TW
 大家好 我是阿倫
 
 """
-                    |> Expect.equal (Ok [ { text = "大家好 我是阿倫", time = 12200 } ])
+                    |> Expect.equal (Ok [ { text = "大家好 我是阿倫", time = 12.2 } ])
         , test "Returns 3 subtitles for a transcript with 3 subtitles" <|
             \_ ->
                 Subtitle.fromTranscript """WEBVTT
@@ -107,8 +107,8 @@ Language: zh
                     |> Expect.equal
                         (Ok
                             [ { text = "大家好 欢迎来到公子时评节目", time = 0 }
-                            , { text = "我是公子沈", time = 2366 }
-                            , { text = "在此之前", time = 3400 }
+                            , { text = "我是公子沈", time = 2.366 }
+                            , { text = "在此之前", time = 3.4 }
                             ]
                         )
         , test "Returns 4 subtitles around the 1 minute mark for a transcript with 4 subtitles" <|
@@ -132,10 +132,10 @@ Language: zh-Hans
 """
                     |> Expect.equal
                         (Ok
-                            [ { text = "现场有25万人参加规模非常大", time = 56832 }
-                            , { text = "赖清德在晚会上说全世界都在关注", time = 63232 }
-                            , { text = "台湾人民会做出怎样的选择", time = 67072 }
-                            , { text = "民进党坚持民主价值和中国偏好的", time = 70400 }
+                            [ { text = "现场有25万人参加规模非常大", time = 56.832 }
+                            , { text = "赖清德在晚会上说全世界都在关注", time = 63.232 }
+                            , { text = "台湾人民会做出怎样的选择", time = 67.072 }
+                            , { text = "民进党坚持民主价值和中国偏好的", time = 70.4 }
                             ]
                         )
         , test "Returns 1 subtitle around the 3 minute mark for a transcript with 1 subtitle" <|
@@ -149,7 +149,7 @@ Language: zh-TW
 
 """
                     |> Expect.equal
-                        (Ok [ { text = "现场有25万人参加规模非常大", time = 176832 } ])
+                        (Ok [ { text = "现场有25万人参加规模非常大", time = 176.832 } ])
         , test "Returns 1 subtitle around the 2 hour and 3 minute mark for a transcript with 1 subtitle" <|
             \_ ->
                 Subtitle.fromTranscript """WEBVTT
@@ -163,7 +163,7 @@ Language: zh-TW
                     |> Expect.equal
                         (Ok
                             [ { text = "现场有25万人参加规模非常大"
-                              , time = 2 * 60 * 60 * 1000 + 2 * 60 * 1000 + 56832
+                              , time = 2 * 60 * 60 + 2 * 60 + 56.832
                               }
                             ]
                         )
