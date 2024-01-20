@@ -433,7 +433,7 @@ viewPracticeTab model =
         Nothing ->
             div [ class "flex flex-col items-center" ]
                 [ div [ class "w-full max-w-2xl flex flex-col items-center gap-4" ]
-                    [ h2 [ class "text-2xl text-center" ]
+                    [ h2 [ class "text-xl text-center" ]
                         [ text <|
                             if List.isEmpty model.videos then
                                 "You haven't added any videos yet."
@@ -443,7 +443,7 @@ viewPracticeTab model =
                         ]
                     , button
                         [ onClick (TabClicked VideosTab)
-                        , class "w-full py-2 px-4 bg-blue-600 rounded-lg"
+                        , class "w-full py-2 px-4 bg-blue-600 rounded-lg text-lg"
                         ]
                         [ text <|
                             if List.isEmpty model.videos then

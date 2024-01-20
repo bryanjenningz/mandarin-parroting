@@ -97,7 +97,7 @@ view props =
             [ href "https://docs.invidious.io/instances/"
             , target "_blank"
             , rel "noopener noreferrer"
-            , class "bg-blue-600 rounded-lg py-2 px-4 text-center"
+            , class "bg-blue-600 rounded-lg py-2 px-4 text-center text-lg"
             ]
             [ text "Find videos on Invidious" ]
         , h2 [ class "text-2xl" ] [ text "Add a new video" ]
@@ -123,7 +123,7 @@ view props =
                 []
             ]
         , button
-            [ class "bg-blue-600 py-2 px-4 rounded-lg"
+            [ class "bg-blue-600 py-2 px-4 rounded-lg text-lg"
             , onClick props.submitNewVideo
             ]
             [ text "Add video" ]
