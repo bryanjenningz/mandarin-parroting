@@ -6,7 +6,7 @@ import Html exposing (Html, a, article, button, div, h2, input, label, text)
 import Html.Attributes exposing (class, for, href, id, rel, target, type_)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as Decode exposing (Decoder)
-import Parser exposing (DeadEnd)
+import Parser exposing (DeadEnd, Problem(..))
 import Subtitle exposing (Subtitle)
 import Video exposing (VideoId)
 
@@ -143,7 +143,7 @@ view props =
                                 "Enter a transcript."
 
                             InvalidTranscript deadEnds ->
-                                Parser.deadEndsToString deadEnds
+                                deadEndsToString deadEnds
                     ]
         ]
 
@@ -151,3 +151,64 @@ view props =
 fileDecoder : Decoder File
 fileDecoder =
     Decode.at [ "target", "files", "0" ] File.decoder
+
+
+deadEndsToString : List DeadEnd -> String
+deadEndsToString deadEnds =
+    deadEnds
+        |> List.map
+            (\deadEnd ->
+                "Error at row: "
+                    ++ String.fromInt deadEnd.row
+                    ++ ", column: "
+                    ++ String.fromInt deadEnd.col
+                    ++ ", problem: "
+                    ++ problemToString deadEnd.problem
+            )
+        |> String.join "\n"
+
+
+problemToString : Problem -> String
+problemToString problem =
+    case problem of
+        Expecting str ->
+            "Expecting " ++ str
+
+        ExpectingInt ->
+            "Expecting an integer"
+
+        ExpectingHex ->
+            "Expecting a hexadecimal number"
+
+        ExpectingOctal ->
+            "Expecting an octal number"
+
+        ExpectingBinary ->
+            "Expecting a binary number"
+
+        ExpectingFloat ->
+            "Expecting a floating point number"
+
+        ExpectingNumber ->
+            "Expecting a number"
+
+        ExpectingVariable ->
+            "Expecting a variable"
+
+        ExpectingSymbol str ->
+            "Expecting a symbol " ++ str
+
+        ExpectingKeyword str ->
+            "Expecting a keyword " ++ str
+
+        ExpectingEnd ->
+            "Expecting an ending"
+
+        UnexpectedChar ->
+            "Unexpected character"
+
+        Problem str ->
+            str
+
+        BadRepeat ->
+            "Bad repeat"

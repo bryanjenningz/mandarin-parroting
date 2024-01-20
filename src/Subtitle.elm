@@ -84,7 +84,7 @@ prev videoTime subtitles =
 type alias ViewSubtitlesProps msg =
     { currentSubtitle : Subtitle
     , subtitles : List Subtitle
-    , setVideoTime : Float -> msg
+    , setVideoTime : VideoTime -> msg
     , dictionary : Dictionary.Model
     , dictionaryLookup : Maybe ( Subtitle, Int )
     , setDictionaryLookup : Maybe ( Subtitle, Int ) -> msg
@@ -203,7 +203,8 @@ subtitlesParser =
         |. Parser.token "Kind: captions"
         |. Parser.spaces
         |. Parser.oneOf
-            [ Parser.token "Language: zh-Hans"
+            [ Parser.token "Language: zh-Hant"
+            , Parser.token "Language: zh-Hans"
             , Parser.token "Language: zh-TW"
             , Parser.token "Language: zh"
             ]
@@ -224,7 +225,7 @@ subtitlesParserHelper revSubtitles =
 
 subtitleParser : Parser Subtitle
 subtitleParser =
-    Parser.succeed (\time text -> { time = toFloat time, text = text })
+    Parser.succeed (\time text -> { time = time, text = text })
         |= timeParser
         |. Parser.spaces
         |. Parser.symbol "-->"
@@ -235,14 +236,14 @@ subtitleParser =
         |. Parser.spaces
 
 
-timeParser : Parser Int
+timeParser : Parser Float
 timeParser =
     Parser.succeed
         (\hours minutes seconds milliseconds ->
-            (hours * 60 * 60 * 1000)
-                + (minutes * 60 * 1000)
-                + (seconds * 1000)
-                + milliseconds
+            (toFloat hours * 60 * 60)
+                + (toFloat minutes * 60)
+                + toFloat seconds
+                + (toFloat milliseconds / 1000)
         )
         |= timeSegmentParser
         |. Parser.symbol ":"
