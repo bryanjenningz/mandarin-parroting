@@ -6,9 +6,10 @@ The goal of this web app is to make it as easy as possible to get good at Mandar
 
 ## How to use this web app
 
-1. Find a YouTube video with a transcript that you're interested in understanding and parroting (Here are [some recommended YouTube channels from the Refold Mandarin community](https://zenith-raincoat-5cf.notion.site/a9369f84c1eb4aa3939441d723f3ab07?v=257cd5b4f0e7413bb857d5e1192f2ca9)).
-2. Paste the YouTube video ID into this web app.
-3. Parrot and look up all the unknown vocab in the YouTube video.
+1. Find a Mandarin YouTube video with a transcript that you're interested in understanding and parroting ([Here are some recommended YouTube channels from the Refold Mandarin community](https://zenith-raincoat-5cf.notion.site/a9369f84c1eb4aa3939441d723f3ab07?v=257cd5b4f0e7413bb857d5e1192f2ca9)).
+2. Copy the video ID and download the transcript VTT file from [Invidious](https://docs.invidious.io/instances).
+3. Paste the YouTube video ID into this web app and upload the transcript VTT file that you downloaded.
+4. Parrot, look up vocab, and save all the unknown vocab in the YouTube video, then review the generated flashcards later.
 
 ## How to effectively parrot
 
@@ -24,7 +25,7 @@ The goal of this web app is to make it as easy as possible to get good at Mandar
 - Comes with a Mandarin Chinese dictionary built in so you can look up unknown Mandarin words
 - Text-to-speech vocab flashcards with a spaced-repetition algorithm
 - Keeps track of your stats and daily goals to keep you motivated so you make progress quickly
-- Works on desktop (Windows, Mac OS, Linux) and mobile (Android, iOS) as a progressive web app with offline mode enabled
+- Works on desktop (Windows, Mac OS, Linux) and mobile (Android, iOS) as an installable progressive web app
 
 ## Credits
 
