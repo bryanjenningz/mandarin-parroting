@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "elm make src/Main.elm --output static/build/main.js --optimize && serve static/",
+    "build": "elm make src/Main.elm --output static/build/main.js --optimize",
     "dev": "elm-watch hot",
     "server": "serve static/"
   },
