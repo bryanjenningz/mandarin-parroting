@@ -10,6 +10,9 @@ dependencies:
     version: 14.2.1
 
 devDependencies:
+  elm:
+    specifier: 0.19.1-6
+    version: 0.19.1-6
   elm-test:
     specifier: 0.19.1-revision12
     version: 0.19.1-revision12
@@ -18,6 +21,38 @@ devDependencies:
     version: 1.1.2
 
 packages:
+
+  /@elm_binaries/darwin_arm64@0.19.1-0:
+    resolution: {integrity: sha512-mjbsH7BNHEAmoE2SCJFcfk5fIHwFIpxtSgnEAqMsVLpBUFoEtAeX+LQ+N0vSFJB3WAh73+QYx/xSluxxLcL6dA==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@elm_binaries/darwin_x64@0.19.1-0:
+    resolution: {integrity: sha512-QGUtrZTPBzaxgi9al6nr+9313wrnUVHuijzUK39UsPS+pa+n6CmWyV/69sHZeX9qy6UfeugE0PzF3qcUiy2GDQ==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@elm_binaries/linux_x64@0.19.1-0:
+    resolution: {integrity: sha512-T1ZrWVhg2kKAsi8caOd3vp/1A3e21VuCpSG63x8rDie50fHbCytTway9B8WHEdnBFv4mYWiA68dzGxYCiFmU2w==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@elm_binaries/win32_x64@0.19.1-0:
+    resolution: {integrity: sha512-yDleiXqSE9EcqKtd9SkC/4RIW8I71YsXzMPL79ub2bBPHjWTcoyyeBbYjoOB9SxSlArJ74HaoBApzT6hY7Zobg==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
 
   /@zeit/schemas@2.29.0:
     resolution: {integrity: sha512-g5QiLIfbg3pLuYUJPlisNKY+epQJTcMDsOnVNkscrDP1oi7vmJnzOANYJI/1pZcVJ6umUkBv3aFtlg1UvUHGzA==}
@@ -288,6 +323,18 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    dev: true
+
+  /elm@0.19.1-6:
+    resolution: {integrity: sha512-mKYyierHICPdMx/vhiIacdPmTPnh889gjHOZ75ZAoCxo3lZmSWbGP8HMw78wyctJH0HwvTmeKhlYSWboQNYPeQ==}
+    engines: {node: '>=7.0.0'}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@elm_binaries/darwin_arm64': 0.19.1-0
+      '@elm_binaries/darwin_x64': 0.19.1-0
+      '@elm_binaries/linux_x64': 0.19.1-0
+      '@elm_binaries/win32_x64': 0.19.1-0
     dev: true
 
   /emoji-regex@8.0.0:
