@@ -27,6 +27,15 @@ The goal of this web app is to make it as easy as possible to get good at Mandar
 - Keeps track of your stats and daily goals to keep you motivated so you make progress quickly
 - Works on desktop (Windows, Mac OS, Linux) and mobile (Android, iOS) as an installable progressive web app
 
+## Screenshots
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+  <img width="200" src="screenshots/screenshot-1.png" alt="" />
+  <img width="200" src="screenshots/screenshot-2.png" alt="" />
+  <img width="200" src="screenshots/screenshot-3.png" alt="" />
+  <img width="200" src="screenshots/screenshot-4.png" alt="" />
+</div>
+
 ## Credits
 
 - This web app was inspired by [Lele Farley's video on parroting](https://youtu.be/z6OVuSRL5oI).
