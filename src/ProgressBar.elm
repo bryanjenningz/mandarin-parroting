@@ -133,7 +133,7 @@ view mode (ProgressBar data) =
     in
     div [ class "relative w-full bg-slate-500 rounded-full h-4 overflow-hidden" ]
         [ div
-            [ class "absolute left-0 top-0 bottom-0 bg-blue-700 transition-all duration-300"
+            [ class "absolute left-0 top-0 bottom-0 bg-blue-700 transition-all duration-500"
             , style "width" width
             ]
             []
