@@ -7,9 +7,7 @@
   "devDependencies": {
     "elm": "0.19.1-6",
     "elm-test": "0.19.1-revision12",
-    "elm-watch": "^1.1.2"
-  },
-  "dependencies": {
+    "elm-watch": "^1.1.2",
     "serve": "^14.2.1"
   }
 }
