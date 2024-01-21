@@ -1,11 +1,14 @@
 {
   "scripts": {
+    "build": "elm make src/Main.elm --output static/build/main.js --optimize && serve static/",
     "dev": "elm-watch hot",
-    "dev-server": "http-server"
+    "server": "serve static/"
   },
   "devDependencies": {
     "elm-test": "0.19.1-revision12",
-    "elm-watch": "^1.1.2",
-    "http-server": "^14.1.1"
+    "elm-watch": "^1.1.2"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
   }
 }

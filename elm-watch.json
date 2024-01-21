@@ -2,7 +2,7 @@
   "targets": {
     "main": {
       "inputs": ["src/Main.elm"],
-      "output": "build/main.js"
+      "output": "static/build/main.js"
     }
   }
 }
