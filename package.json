@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "build": "elm make src/Main.elm --output static/build/main.js --optimize",
+    "build": "pnpm run build:elm && pnpm run build:css",
+    "build:elm": "elm make src/Main.elm --output static/build/main.js --optimize",
+    "build:css": "tailwindcss -i ./static/main.css -o ./static/build/main.css",
     "dev": "elm-watch hot",
     "server": "serve static/"
   },
@@ -8,6 +10,7 @@
     "elm": "0.19.1-6",
     "elm-test": "0.19.1-revision12",
     "elm-watch": "^1.1.2",
-    "serve": "^14.2.1"
+    "serve": "^14.2.1",
+    "tailwindcss": "^3.4.1"
   }
 }
