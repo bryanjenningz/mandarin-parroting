@@ -2,7 +2,7 @@ module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVide
 
 import File exposing (File)
 import Html exposing (Html, a, article, button, div, h2, input, label, text)
-import Html.Attributes exposing (class, for, href, id, rel, target, type_)
+import Html.Attributes exposing (accept, class, for, href, id, rel, target, type_)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as Decode exposing (Decoder)
 import Parser exposing (DeadEnd, Problem(..))
@@ -118,6 +118,7 @@ view props =
                 [ id "new-video-transcript-file"
                 , class "bg-slate-700 p-2 rounded-lg"
                 , type_ "file"
+                , accept "text/vtt"
                 , on "change" (Decode.map props.setNewVideoTranscriptFile fileDecoder)
                 ]
                 []
