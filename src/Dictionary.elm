@@ -279,7 +279,7 @@ viewLine props =
                     text ""
                 ]
             , button
-                [ class "bg-blue-600 text-white w-6 h-6 rounded-lg flex justify-center items-center text-sm font-bold"
+                [ class "bg-blue-600 text-white w-8 h-8 rounded-lg flex justify-center items-center text-sm font-bold"
                 , if props.isFlashcard then
                     onClick (props.deleteFlashcard (Flashcard.from props.line))
 
