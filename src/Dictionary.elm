@@ -116,7 +116,7 @@ view props =
                 text "Failed to load dictionary."
 
             Dictionary dictionaryData ->
-                case search props.searchText dictionaryData of
+                case search (filterOutSpaces props.searchText) dictionaryData of
                     Nothing ->
                         text ("No results for the text \"" ++ props.searchText ++ "\"")
 
@@ -132,6 +132,16 @@ view props =
 
 
 -- INTERNAL
+
+
+filterOutSpaces : String -> String
+filterOutSpaces str =
+    String.filter isNotSpace str
+
+
+isNotSpace : Char -> Bool
+isNotSpace ch =
+    ch /= ' ' && ch /= '\t' && ch /= '\n'
 
 
 binarySearchTraditional : String -> DictionaryData -> Maybe Line
