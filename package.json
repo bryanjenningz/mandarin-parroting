@@ -1,11 +1,12 @@
 {
   "scripts": {
-    "build": "pnpm run build:elm && pnpm run build:js && pnpm run build:css",
+    "build": "pnpm build:elm && pnpm build:js && pnpm build:css",
     "build:elm": "elm make src/Main.elm --output static/build/main.js --optimize",
     "build:js": "uglifyjs static/build/main.js --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' | uglifyjs --mangle --output static/build/main.js",
     "build:css": "tailwindcss -i ./static/main.css -o ./static/build/main.css",
     "dev": "elm-watch hot",
-    "server": "serve static/"
+    "dev:css": "pnpm build:css -- --watch",
+    "dev:server": "serve static/"
   },
   "devDependencies": {
     "elm": "0.19.1-6",
