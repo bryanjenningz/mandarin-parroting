@@ -123,7 +123,7 @@ view props =
                                             ]
                                             [ text char
                                             , if selected then
-                                                div [ class "absolute top-100 min-w-64 z-20 bg-black text-white p-4 rounded-lg border border-white" ]
+                                                div [ class "absolute top-100 min-w-72 z-20 bg-black text-white p-4 rounded-lg border border-white" ]
                                                     [ Dictionary.view
                                                         { searchText = String.dropLeft i subtitle.text
                                                         , dictionary = props.dictionary
