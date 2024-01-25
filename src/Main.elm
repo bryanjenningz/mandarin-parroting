@@ -404,7 +404,9 @@ viewVideosTab : Model -> Html Msg
 viewVideosTab model =
     div [ class "flex flex-col items-center gap-4" ]
         [ NewVideo.view
-            { setNewVideoId = SetNewVideoId
+            { newVideoId = NewVideo.videoId model.newVideo
+            , setNewVideoId = SetNewVideoId
+            , newVideoTranscript = NewVideo.transcript model.newVideo
             , setNewVideoTranscriptFile = SetNewVideoTranscriptFile
             , submitNewVideo = SubmitNewVideo
             , newVideoError = model.newVideoError

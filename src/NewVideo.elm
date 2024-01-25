@@ -2,7 +2,7 @@ module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVide
 
 import File exposing (File)
 import Html exposing (Html, a, article, button, div, h2, input, label, text)
-import Html.Attributes exposing (accept, class, for, href, id, rel, target, type_)
+import Html.Attributes exposing (accept, class, for, href, id, rel, target, type_, value)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as Decode exposing (Decoder)
 import Parser exposing (DeadEnd, Problem(..))
@@ -93,7 +93,9 @@ encode (ValidNewVideo newVideo) =
 
 
 type alias ViewProps msg =
-    { setNewVideoId : String -> msg
+    { newVideoId : String
+    , setNewVideoId : String -> msg
+    , newVideoTranscript : String
     , setNewVideoTranscriptFile : File -> msg
     , submitNewVideo : msg
     , newVideoError : Maybe Error
@@ -117,6 +119,7 @@ view props =
             , input
                 [ id "new-video-id-input"
                 , class "bg-slate-700 p-2 rounded-lg"
+                , value props.newVideoId
                 , onInput props.setNewVideoId
                 ]
                 []
@@ -129,6 +132,7 @@ view props =
                 , class "bg-slate-700 p-2 rounded-lg"
                 , type_ "file"
                 , accept "text/vtt"
+                , value props.newVideoTranscript
                 , on "change" (Decode.map props.setNewVideoTranscriptFile fileDecoder)
                 ]
                 []
