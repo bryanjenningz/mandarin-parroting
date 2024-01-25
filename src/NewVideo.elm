@@ -1,4 +1,4 @@
-module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, validate, view)
+module NewVideo exposing (Error, NewVideo, empty, encode, setTranscript, setVideoId, transcript, validate, videoId, view)
 
 import File exposing (File)
 import Html exposing (Html, a, article, button, div, h2, input, label, text)
@@ -29,14 +29,24 @@ empty =
         }
 
 
+videoId : NewVideo -> String
+videoId (NewVideo newVideo) =
+    newVideo.newVideoId
+
+
 setVideoId : VideoId -> NewVideo -> NewVideo
-setVideoId videoId (NewVideo newVideo) =
-    NewVideo { newVideo | newVideoId = videoId }
+setVideoId newVideoId (NewVideo newVideo) =
+    NewVideo { newVideo | newVideoId = newVideoId }
+
+
+transcript : NewVideo -> String
+transcript (NewVideo newVideo) =
+    newVideo.newVideoTranscript
 
 
 setTranscript : String -> NewVideo -> NewVideo
-setTranscript transcript (NewVideo newVideo) =
-    NewVideo { newVideo | newVideoTranscript = transcript }
+setTranscript newVideoTranscript (NewVideo newVideo) =
+    NewVideo { newVideo | newVideoTranscript = newVideoTranscript }
 
 
 
