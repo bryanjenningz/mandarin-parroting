@@ -34,10 +34,12 @@ main =
 
 type alias Model =
     { tab : Tab
-    , videoId : Maybe VideoId
-    , videoIsPlaying : Bool
-    , videoTime : VideoTime
-    , videoSpeed : Int
+    , currentVideo :
+        { videoId : Maybe VideoId
+        , videoIsPlaying : Bool
+        , videoTime : VideoTime
+        , videoSpeed : Int
+        }
     , videos : List Video
     , newVideo : NewVideo
     , newVideoError : Maybe NewVideo.Error
@@ -56,10 +58,12 @@ init value =
             Flags.decode value
     in
     ( { tab = VideosTab
-      , videoId = flags.videoId
-      , videoIsPlaying = False
-      , videoTime = 0
-      , videoSpeed = flags.videoSpeed
+      , currentVideo =
+            { videoId = flags.videoId
+            , videoIsPlaying = False
+            , videoTime = 0
+            , videoSpeed = flags.videoSpeed
+            }
       , videos = flags.videos
       , newVideo = NewVideo.empty
       , newVideoError = Nothing
@@ -114,24 +118,30 @@ update msg model =
 
         TabClicked tab ->
             ( { model | tab = tab, flashcardBackShown = False }
-            , Video.getById model.videoId model.videos
-                |> Maybe.andThen (\video -> Subtitle.at model.videoTime video.subtitles)
+            , Video.getById model.currentVideo.videoId model.videos
+                |> Maybe.andThen (\video -> Subtitle.at model.currentVideo.videoTime video.subtitles)
                 |> Maybe.map (\subtitle -> Subtitle.jumpTo { subtitle = subtitle, noop = NoOp })
                 |> Maybe.withDefault Cmd.none
             )
 
         StartVideo videoId ->
             let
+                currentVideo =
+                    model.currentVideo
+
                 newModel =
                     { model
                         | tab = PracticeTab
-                        , videoId = Just videoId
-                        , videoIsPlaying = True
+                        , currentVideo =
+                            { currentVideo
+                                | videoId = Just videoId
+                                , videoIsPlaying = True
+                            }
                     }
             in
             ( newModel
             , Cmd.batch
-                [ if Just videoId == model.videoId then
+                [ if Just videoId == model.currentVideo.videoId then
                     playVideo ()
 
                   else
@@ -141,18 +151,30 @@ update msg model =
             )
 
         PlayVideo ->
-            ( { model | videoIsPlaying = True }, playVideo () )
+            let
+                currentVideo =
+                    model.currentVideo
+            in
+            ( { model | currentVideo = { currentVideo | videoIsPlaying = True } }
+            , playVideo ()
+            )
 
         PauseVideo ->
-            ( { model | videoIsPlaying = False }, pauseVideo () )
+            let
+                currentVideo =
+                    model.currentVideo
+            in
+            ( { model | currentVideo = { currentVideo | videoIsPlaying = False } }
+            , pauseVideo ()
+            )
 
         FastForward ->
             let
                 maybeNextSubtitleTime : Maybe VideoTime
                 maybeNextSubtitleTime =
-                    Video.getById model.videoId model.videos
+                    Video.getById model.currentVideo.videoId model.videos
                         |> Maybe.map .subtitles
-                        |> Maybe.andThen (Subtitle.next model.videoTime)
+                        |> Maybe.andThen (Subtitle.next model.currentVideo.videoTime)
                         |> Maybe.map .time
             in
             case maybeNextSubtitleTime of
@@ -166,9 +188,9 @@ update msg model =
             let
                 maybePrevSubtitleTime : Maybe VideoTime
                 maybePrevSubtitleTime =
-                    Video.getById model.videoId model.videos
+                    Video.getById model.currentVideo.videoId model.videos
                         |> Maybe.map .subtitles
-                        |> Maybe.andThen (Subtitle.prev model.videoTime)
+                        |> Maybe.andThen (Subtitle.prev model.currentVideo.videoTime)
                         |> Maybe.map .time
             in
             case maybePrevSubtitleTime of
@@ -179,7 +201,11 @@ update msg model =
                     ( model, setVideoTime videoTime )
 
         GetVideoTime videoTime ->
-            ( { model | videoTime = videoTime }, Cmd.none )
+            let
+                currentVideo =
+                    model.currentVideo
+            in
+            ( { model | currentVideo = { currentVideo | videoTime = videoTime } }, Cmd.none )
 
         SetVideoTime videoTime ->
             ( model, setVideoTime videoTime )
@@ -189,8 +215,11 @@ update msg model =
 
         SetVideoSpeed videoSpeed ->
             let
+                currentVideo =
+                    model.currentVideo
+
                 newModel =
-                    { model | videoSpeed = clamp 50 200 videoSpeed }
+                    { model | currentVideo = { currentVideo | videoSpeed = clamp 50 200 videoSpeed } }
             in
             ( newModel
             , Cmd.batch
@@ -325,8 +354,8 @@ update msg model =
 
 saveModel : Model -> Cmd Msg
 saveModel model =
-    { videoId = model.videoId
-    , videoSpeed = model.videoSpeed
+    { videoId = model.currentVideo.videoId
+    , videoSpeed = model.currentVideo.videoSpeed
     , videos = model.videos
     , flashcards = model.flashcards
     , progressBar = model.progressBar
@@ -418,8 +447,8 @@ viewVideosTab model =
                         { pauseVideo = PauseVideo
                         , playVideo = PlayVideo
                         , startVideo = StartVideo
-                        , videoId = model.videoId
-                        , videoIsPlaying = model.videoIsPlaying
+                        , videoId = model.currentVideo.videoId
+                        , videoIsPlaying = model.currentVideo.videoIsPlaying
                         , video = video
                         , deleteVideo = DeleteVideo video
                         }
@@ -431,7 +460,7 @@ viewVideosTab model =
 
 viewPracticeTab : Model -> Html Msg
 viewPracticeTab model =
-    case Video.getById model.videoId model.videos of
+    case Video.getById model.currentVideo.videoId model.videos of
         Nothing ->
             div [ class "flex flex-col items-center" ]
                 [ div [ class "w-full max-w-2xl flex flex-col items-center gap-4" ]
@@ -460,7 +489,7 @@ viewPracticeTab model =
         Just video ->
             let
                 currentSubtitle =
-                    Subtitle.at model.videoTime video.subtitles
+                    Subtitle.at model.currentVideo.videoTime video.subtitles
             in
             div [ class "flex flex-col items-center gap-2 h-[80vh]" ]
                 [ div [ class "relative w-full" ]
@@ -469,13 +498,13 @@ viewPracticeTab model =
                     [ ProgressBar.view ProgressBar.FlashcardsSavedMode model.progressBar ]
                 , div [ class "text-xl text-center" ] [ text video.title ]
                 , Video.viewSlider
-                    { videoTime = model.videoTime
+                    { videoTime = model.currentVideo.videoTime
                     , setVideoTime = SetVideoTime
                     }
                     video
                 , div [ class "text-xs" ]
                     [ text
-                        (VideoTime.toString model.videoTime
+                        (VideoTime.toString model.currentVideo.videoTime
                             ++ " / "
                             ++ VideoTime.toString video.duration
                         )
@@ -488,8 +517,8 @@ viewPracticeTab model =
                         button [ onClick (JumpToSubtitle subtitle), class "text-xl" ]
                             [ text subtitle.text ]
                 , Video.viewControls
-                    { videoIsPlaying = model.videoIsPlaying
-                    , videoSpeed = model.videoSpeed
+                    { videoIsPlaying = model.currentVideo.videoIsPlaying
+                    , videoSpeed = model.currentVideo.videoSpeed
                     , fastForward = FastForward
                     , fastRewind = FastRewind
                     , setVideoSpeed = SetVideoSpeed
@@ -542,7 +571,7 @@ subscriptions model =
         , ProgressBar.subscriptions
             { setProgressBar = SetProgressBar
             , progressBar = model.progressBar
-            , videoIsPlaying = model.videoIsPlaying
+            , videoIsPlaying = model.currentVideo.videoIsPlaying
             }
         ]
 
