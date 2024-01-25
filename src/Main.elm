@@ -34,12 +34,7 @@ main =
 
 type alias Model =
     { tab : Tab
-    , currentVideo :
-        { videoId : Maybe VideoId
-        , videoIsPlaying : Bool
-        , videoTime : VideoTime
-        , videoSpeed : Int
-        }
+    , currentVideo : CurrentVideo
     , videos : List Video
     , newVideo : NewVideo
     , newVideoError : Maybe NewVideo.Error
@@ -48,6 +43,14 @@ type alias Model =
     , flashcards : List Flashcard
     , flashcardBackShown : Bool
     , progressBar : ProgressBar
+    }
+
+
+type alias CurrentVideo =
+    { videoId : Maybe VideoId
+    , videoIsPlaying : Bool
+    , videoTime : VideoTime
+    , videoSpeed : Int
     }
 
 
