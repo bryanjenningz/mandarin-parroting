@@ -141,7 +141,7 @@ view props =
                                 )
                             , button
                                 [ onClick (props.setVideoTime subtitle.time)
-                                , class "bg-blue-600 text-white rounded-lg w-6 h-6 text-sm"
+                                , class "bg-blue-600 text-white rounded-lg w-6 h-6 text-sm shrink-0"
                                 ]
                                 [ text "▶" ]
                             ]
