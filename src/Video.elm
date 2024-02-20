@@ -121,23 +121,23 @@ viewCard props =
                     , class "py-2 px-4 bg-blue-600 rounded-lg"
                     ]
                     [ text "Practice" ]
-                , if props.videoId == Just props.video.videoId then
-                    div [ class "flex gap-2" ]
-                        [ button
-                            [ class "bg-red-600 rounded-lg w-12 h-12 text-lg font-bold"
-                            , onClick props.deleteVideo
-                            ]
-                            [ labeledSymbol "Delete" "×" ]
-                        , playButton
+                , div [ class "flex gap-2" ]
+                    [ if props.videoId == Just props.video.videoId then
+                        playButton
                             { videoIsPlaying = props.videoIsPlaying
                             , playVideo = props.playVideo
                             , pauseVideo = props.pauseVideo
                             }
                             [ class "bg-blue-600 rounded-lg w-12 h-12" ]
-                        ]
 
-                  else
-                    text ""
+                      else
+                        text ""
+                    , button
+                        [ class "bg-red-600 rounded-lg w-12 h-12 text-lg font-bold"
+                        , onClick props.deleteVideo
+                        ]
+                        [ labeledSymbol "Delete" "×" ]
+                    ]
                 ]
             ]
         ]
