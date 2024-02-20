@@ -132,7 +132,6 @@ view props =
                 , class "bg-slate-700 p-2 rounded-lg"
                 , type_ "file"
                 , accept "text/vtt"
-                , value props.newVideoTranscript
                 , on "change" (Decode.map props.setNewVideoTranscriptFile fileDecoder)
                 ]
                 []
